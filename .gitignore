@@ -2,6 +2,9 @@
 .kotlin
 .gradle
 **/build/
+gradle/wrapper
+gradlew
+gradlew.bat
 xcuserdata
 !src/**/build/
 local.properties
