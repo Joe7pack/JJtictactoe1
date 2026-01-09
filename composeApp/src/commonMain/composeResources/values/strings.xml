@@ -1,0 +1,16 @@
+<resources>
+    <string name="home">Home</string>
+    <string name="favorites">Favorite Spumoni</string>
+    <string name="shopping">Shopping</string>
+    <string name="profile">Profile</string>
+
+    <string-array name="planets_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+    </string-array>
+
+</resources>
