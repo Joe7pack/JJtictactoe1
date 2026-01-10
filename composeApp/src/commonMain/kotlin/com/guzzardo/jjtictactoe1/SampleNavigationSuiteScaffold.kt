@@ -67,7 +67,7 @@ import org.jetbrains.compose.resources.getStringArray
  */
 
 
-var planetList = Res.array.planets_array.key
+//var planetList = Res.array.planets_array.key
 
 @Composable
 fun Icons() {
@@ -125,16 +125,17 @@ fun MyScreen2() {
 @Composable
 fun TestFun(menuString: String) {
 
+    /*
     Row() {
         //Text(text = menuString)
         KmpCanvasExample()
     }
+     */
 
-    /*
     Row() {
         //SampleNavigationSuiteScaffoldParts()
         MyScreen()
-    } */
+    }
 }
 
 @Composable
