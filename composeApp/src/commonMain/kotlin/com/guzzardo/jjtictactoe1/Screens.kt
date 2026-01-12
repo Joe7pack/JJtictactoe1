@@ -15,7 +15,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun MyScreen(viewModel: MyViewModel = viewModel { MyViewModel() }) {
     // Observe the resource reference from ViewModel

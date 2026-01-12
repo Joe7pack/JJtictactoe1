@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.getStringArray
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 //class SampleNavigationSuiteScaffold { }
 
@@ -122,6 +123,7 @@ fun MyScreen2() {
     // ... UI code using arrayValues ...
 }
 
+@Preview
 @Composable
 fun TestFun(menuString: String) {
 
@@ -134,7 +136,8 @@ fun TestFun(menuString: String) {
 
     Row() {
         //SampleNavigationSuiteScaffoldParts()
-        MyScreen()
+       //MyScreen()
+        TestImage()
     }
 }
 

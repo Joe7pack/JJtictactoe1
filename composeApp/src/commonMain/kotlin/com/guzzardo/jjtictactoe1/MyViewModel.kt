@@ -9,7 +9,7 @@ import jjtictactoe1.composeapp.generated.resources.planets_array
 
 //class MyViewModel { }
 
-class MyViewModel : ViewModel() {
+open class MyViewModel : ViewModel() {
     // Initial state points to a specific generated StringArrayResource
     private val _currentArray = MutableStateFlow<StringArrayResource>(Res.array.planets_array)
     val currentArray = _currentArray.asStateFlow()
