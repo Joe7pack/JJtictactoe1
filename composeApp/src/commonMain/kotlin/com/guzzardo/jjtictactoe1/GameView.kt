@@ -116,9 +116,14 @@ class GameView: MyViewModel() {
     private val mTakenRect = IntRect
     private var mOffsetX = 0
     private var mOffsetY = 0
+} /* need to remove this end brace before uncommenting rest of this class!!! */
 
 //private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to make token blink
 
+// Paint class is a fundamental component of Android's 2D drawing framework. It holds the style and color information about
+// how to draw shapes, text, and bitmaps to a Canvas.
+// The Paint() constructor creates a new Paint object with default settings.
+/*
     private val mWinPaint = Paint()
     private val mLinePaint = Paint()
     private val mBmpPaint = Paint()
@@ -168,7 +173,9 @@ class GameView: MyViewModel() {
             var i = 0
             var k = mSxy
             while (i < 4) {
-                canvas.drawLine(
+            // drawLine(float startX, float startY, float stopX, float stopY, Paint paint)
+            // paint: The Paint object used to define the color, stroke width, and other properties of the line.
+                  canvas.drawLine(
                     x7.toFloat(),
                     (y7 + k).toFloat(),
                     (x7 + s3 - 1).toFloat(),
@@ -1360,8 +1367,6 @@ class GameView: MyViewModel() {
             mTokenColor2 = settings.getInt(GameActivity.TOKEN_COLOR_2, Color.BLUE)
         }
 
- */
-
     companion object {
         const val FPS_MS = (1000 / 2).toLong()
 
@@ -1519,3 +1524,4 @@ class GameView: MyViewModel() {
         INITIALIZATIONCOMPLETED = false
     }
 }
+     */
