@@ -15,18 +15,9 @@ package com.guzzardo.jjtictactoe1
  * limitations under the License.
  */
 
-/*
-import android.content.res.Resources
-import android.graphics.*
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
-import android.util.AttributeSet
-import android.util.Log
-import android.view.MotionEvent
-import android.view.View
+
+
 import androidx.compose.ui.geometry.Rect
-import androidx.core.content.res.ResourcesCompat
 import com.guzzardo.jjtictactoe1.ColorBall.Companion.setTokenColor
 import com.guzzardo.jjtictactoe1.GameActivity.ClientThread
 import com.guzzardo.jjtictactoe1.GameActivity.Companion.moveModeTouch
@@ -39,7 +30,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 import kotlin.math.sqrt
-*/
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -58,12 +48,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
+//import jjtictactoe1.GameView.Companion.TOKENSIZE
+//import com.guzzardo.jjtictactoe1.GameView.Companion.mSxy
 import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.homeicon
 import jjtictactoe1.composeapp.generated.resources.shopping
@@ -74,8 +69,17 @@ import org.jetbrains.compose.resources.stringResource
 
 //import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossblue
+import jjtictactoe1.composeapp.generated.resources.lib_circlered
+import jjtictactoe1.composeapp.generated.resources.lib_crossred
+import jjtictactoe1.composeapp.generated.resources.lib_crossgreen
+import jjtictactoe1.composeapp.generated.resources.lib_circleblue
+import jjtictactoe1.composeapp.generated.resources.lib_circlecrossgreen
+import jjtictactoe1.composeapp.generated.resources.lib_circlecrossred
+import jjtictactoe1.composeapp.generated.resources.lib_circlegreen
+import jjtictactoe1.composeapp.generated.resources.lib_crossblue
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.random.Random
 
 @Preview
 @Composable
@@ -94,7 +98,7 @@ fun TestImage(viewModel: MyViewModel = viewModel { MyViewModel() }) {
 }
 
 //class GameView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
-class GameView: MyViewModel() {
+class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewModel() {
     enum class State(val value: Int) {
         UNKNOWN(-3), WIN(-2), EMPTY(0), PLAYER1(1), PLAYER2(2), PLAYERBOTH(3);
 
@@ -111,19 +115,19 @@ class GameView: MyViewModel() {
     }
 
     private var mViewDisabled = false
-    private val mSrcRect = IntRect
-    private val mDstRect = IntRect
-    private val mTakenRect = IntRect
+    private val mSrcRect = Rect
+    private var mDstRect = Rect(0F,0F,0F,0F)
+    private val mTakenRect = Rect
     private var mOffsetX = 0
     private var mOffsetY = 0
-} /* need to remove this end brace before uncommenting rest of this class!!! */
+/*  } need to remove this end brace before uncommenting rest of this class!!! */
 
 //private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to make token blink
 
 // Paint class is a fundamental component of Android's 2D drawing framework. It holds the style and color information about
 // how to draw shapes, text, and bitmaps to a Canvas.
 // The Paint() constructor creates a new Paint object with default settings.
-/*
+
     private val mWinPaint = Paint()
     private val mLinePaint = Paint()
     private val mBmpPaint = Paint()
@@ -164,8 +168,8 @@ class GameView: MyViewModel() {
     private var mBlinkDisplayOff = false
     private val mBlinkRect = IntRect
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    fun drawGameBoard(canvas: Canvas, canvasWidth: Int, canvasHeight: Int) {
+        initializeBoard(canvasWidth, canvasHeight)
         val s3 = mSxy * 5
         val x7 = mOffsetX
         val y7 = mOffsetY
@@ -176,17 +180,13 @@ class GameView: MyViewModel() {
             // drawLine(float startX, float startY, float stopX, float stopY, Paint paint)
             // paint: The Paint object used to define the color, stroke width, and other properties of the line.
                   canvas.drawLine(
-                    x7.toFloat(),
-                    (y7 + k).toFloat(),
-                    (x7 + s3 - 1).toFloat(),
-                    (y7 + k).toFloat(),
+                    Offset(x7.toFloat(), (y7 + k).toFloat()), //start
+                    Offset((x7 + s3 - 1).toFloat(), (y7 + k).toFloat()), //stop
                     mLinePaint
                 ) // draw horizontal rows
                 canvas.drawLine(
-                    (x7 + k).toFloat(),
-                    y7.toFloat(),
-                    (x7 + k).toFloat(),
-                    (y7 + s3 - 1).toFloat(),
+                    Offset((x7 + k).toFloat(), y7.toFloat()),
+                    Offset((x7 + k).toFloat(), (y7 + s3 - 1).toFloat()),
                     mLinePaint
                 ) // draw vertical columns
                 i++
@@ -195,30 +195,41 @@ class GameView: MyViewModel() {
         }
         setAvailableMoves(canvas, mSelectedCell, boardSpaceValues, boardSpaceAvailableValues)
         val prizeDrawn = false
-        if (moveModeTouch) {
+        //if (moveModeTouch) {
+        if (1 == 2) {
             if (mSelectedCell > -1) {
                 val xValue = mSelectedCell % 5
                 val yValue = calculateYValue(mSelectedCell)
-                mDstRect.offsetTo(
-                    MARGIN + mOffsetX + mSxy * xValue,
-                    MARGIN + mOffsetY + mSxy * yValue
+                mDstRect.translate(
+                    (MARGIN + mOffsetX + mSxy * xValue).toFloat(),
+                    (MARGIN + mOffsetY + mSxy * yValue).toFloat()
                 )
+                val offsetX = mDstRect.left
+                val offsetY = mDstRect.top
+                val offsetImage = Offset(offsetX, offsetY)
                 if (mBlinkDisplayOff) {
-                    canvas.drawBitmap(mBmpAvailableMove!!, mTakenRect, mDstRect, null)
+                    canvas.drawImage(mBmpAvailableMove, offsetImage, mBmpPaint)
                 } else {
-                    canvas.drawBitmap(mBmpTakenMove!!, mTakenRect, mDstRect, null)
+                    canvas.drawImage(mBmpTakenMove, offsetImage, mBmpPaint)
                 }
             }
         }
-        mDstRect.offsetTo(MARGIN + mOffsetX + mSxy * 2, MARGIN + mOffsetY + mSxy * 2)
-        val tokenToDraw: Bitmap? = tokenToDrawCenter
-        canvas.drawBitmap(tokenToDraw!!, mSrcRect, mDstRect, mBmpPaint)
+        mDstRect.translate((MARGIN + mOffsetX + mSxy * 2).toFloat(),
+            (MARGIN + mOffsetY + mSxy * 2).toFloat())
+        val offsetX = mDstRect.left
+        val offsetY = mDstRect.top
+        val offsetImage = Offset(offsetX, offsetY)
+        val tokenToDraw: ImageBitmap = tokenToDrawCenter
+        canvas.drawImage(tokenToDraw, offsetImage, mBmpPaint)
         if (prizeLocation > -1 && !prizeDrawn) {
-            mDstRect.offsetTo(
-                MARGIN + mOffsetX + mSxy * mPrizeXBoardLocation,
-                MARGIN + mOffsetY + mSxy * mPrizeYBoardLocation
+            mDstRect.translate(
+                (MARGIN + mOffsetX + mSxy * mPrizeXBoardLocation).toFloat(),
+                (MARGIN + mOffsetY + mSxy * mPrizeYBoardLocation).toFloat()
             )
-            canvas.drawBitmap(mBmpPrize!!, mSrcRect, mDstRect, mBmpPaint)
+            val offsetX = mDstRect.left
+            val offsetY = mDstRect.top
+            val offsetImage = Offset(offsetX, offsetY)
+            canvas.drawImage(mBmpPrize, offsetImage, mBmpPaint)
         }
         var j = 0
         var k = 0
@@ -227,7 +238,10 @@ class GameView: MyViewModel() {
             var i = 0
             var x = x7
             while (i < 5) {
-                mDstRect.offsetTo(MARGIN + x, MARGIN + y)
+                mDstRect.translate((MARGIN + x).toFloat(), (MARGIN + y).toFloat())
+                val offsetX = mDstRect.left
+                val offsetY = mDstRect.top
+                val offsetImage = Offset(offsetX, offsetY)
                 var v: State?
                 if (mSelectedCell == k) {
                     if (mBlinkDisplayOff) {
@@ -243,7 +257,7 @@ class GameView: MyViewModel() {
                 if (HUMAN_VS_HUMAN && (v == State.PLAYER1 || v == State.PLAYER2)) {
                     if (mSelectedCell == k && boardSpaceAvailableValues[k]) {
                         //this is required to allow blinking
-                        canvas.drawBitmap(mBmpAvailableMove!!, mTakenRect, mDstRect, null)
+                        canvas.drawImage(mBmpAvailableMove, offsetImage, mBmpPaint)
                     } else {
                         if (k != BoardSpaceValues.BOARDCENTER) {
                             drawPlayerToken(canvas, k)
@@ -253,11 +267,10 @@ class GameView: MyViewModel() {
                     when (v) {
                         State.PLAYER1 -> if (mSelectedCell == k && boardSpaceAvailableValues[k]) {
                             //this is required to allow blinking
-                            canvas.drawBitmap(mBmpAvailableMove!!, mTakenRect, mDstRect, null)
+                            canvas.drawImage(mBmpAvailableMove,offsetImage, mBmpPaint)
                         } else {
                             drawPlayerToken(canvas, k)
                         }
-
                         State.PLAYER2 -> drawPlayerToken(canvas, k)
                         else -> { /* not applicable to player2 */
                         }
@@ -273,130 +286,118 @@ class GameView: MyViewModel() {
         if (mWinRow >= 0) {
             val a = y7 + mWinRow * mSxy + mSxy / 2
             canvas.drawLine(
-                (x7 + MARGIN).toFloat(),
-                a.toFloat(),
-                (x7 + s3 - 1 - MARGIN).toFloat(),
-                a.toFloat(),
+                Offset((x7 + MARGIN).toFloat(), a.toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN).toFloat(), a.toFloat()),
                 mWinPaint
             )
         } else if (mWinCol >= 0) {
             val x = x7 + mWinCol * mSxy + mSxy / 2
             canvas.drawLine(
-                x.toFloat(),
-                (y7 + MARGIN).toFloat(),
-                x.toFloat(),
-                (y7 + s3 - 1 - MARGIN).toFloat(),
+                Offset(x.toFloat(), (y7 + MARGIN).toFloat()),
+                Offset(x.toFloat(), (y7 + s3 - 1 - MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 0) {
             // diagonal 0 is from (0,0) to (2,2)
             canvas.drawLine(
-                (x7 + MARGIN).toFloat(),
-                (y7 + MARGIN).toFloat(),
-                (x7 + s3 - 1 - MARGIN).toFloat(),
-                (y7 + s3 - 1 - MARGIN).toFloat(),
+                Offset((x7 + MARGIN).toFloat(), (y7 + MARGIN).toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN).toFloat(), (y7 + s3 - 1 - MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 2) {
             // diagonal 0 is from (0,0) to (2,2)
             canvas.drawLine(
-                (x7 + MARGIN + mSxy).toFloat(),
-                (y7 + MARGIN).toFloat(),
-                (x7 + s3 - 1 - MARGIN).toFloat(),
-                (y7 + s3 - 1 - MARGIN - mSxy).toFloat(),
+                Offset((x7 + MARGIN + mSxy).toFloat(), (y7 + MARGIN).toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN).toFloat(), (y7 + s3 - 1 - MARGIN - mSxy).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 3) {
             canvas.drawLine(
-                (x7 + MARGIN + 2 * mSxy).toFloat(),
-                (y7 + MARGIN).toFloat(),
-                (x7 + s3 - 1 - MARGIN).toFloat(),
-                (y7 + s3 - 1 - MARGIN - 2 * mSxy).toFloat(),
+                Offset((x7 + MARGIN + 2 * mSxy).toFloat(), (y7 + MARGIN).toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN).toFloat(), (y7 + s3 - 1 - MARGIN - 2 * mSxy).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 5) {
             canvas.drawLine(
-                (x7 + MARGIN).toFloat(),
-                (y7 + MARGIN + 2 * mSxy).toFloat(),
-                (x7 + s3 - 1 - MARGIN - 2 * mSxy).toFloat(),
-                (y7 + s3 - 1 - MARGIN).toFloat(),
+                Offset((x7 + MARGIN).toFloat(), (y7 + MARGIN + 2 * mSxy).toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN - 2 * mSxy).toFloat(), (y7 + s3 - 1 - MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 4) {
             canvas.drawLine(
-                (x7 + MARGIN).toFloat(),
-                (y7 + MARGIN + mSxy).toFloat(),
-                (x7 + s3 - 1 - MARGIN - mSxy).toFloat(),
-                (y7 + s3 - 1 - MARGIN).toFloat(),
+                Offset((x7 + MARGIN).toFloat(), (y7 + MARGIN + mSxy).toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN - mSxy).toFloat(), (y7 + s3 - 1 - MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 6) {
             // diagonal 6 is from (0,3) to (15,0)
             canvas.drawLine(
-                (x7 + MARGIN - 0 * mSxy).toFloat(),
-                (y7 + s3 - 1 - MARGIN - 1 * mSxy).toFloat(),
-                (x7 + s3 + 2 - MARGIN - 1 * mSxy).toFloat(),
-                (y7 + MARGIN).toFloat(),
+                Offset((x7 + MARGIN - 0 * mSxy).toFloat(), (y7 + s3 - 1 - MARGIN - 1 * mSxy).toFloat()),
+                Offset((x7 + s3 + 2 - MARGIN - 1 * mSxy).toFloat(), (y7 + MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 7) {
             // diagonal 7 is from (0,4) to (20,0)
             canvas.drawLine(
-                (x7 + MARGIN).toFloat(),
-                (y7 + s3 - 1 - MARGIN).toFloat(),
-                (x7 + s3 - 1 - MARGIN).toFloat(),
-                (y7 + MARGIN).toFloat(),
+                Offset((x7 + MARGIN).toFloat(), (y7 + s3 - 1 - MARGIN).toFloat()),
+                Offset((x7 + s3 - 1 - MARGIN).toFloat(), (y7 + MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 1) {
             // diagonal 1 is from (0,2) to (10,0)
             canvas.drawLine(
-                (x7 + MARGIN - 0 * mSxy).toFloat(),
-                (y7 + s3 - 1 - MARGIN - 2 * mSxy).toFloat(),
-                (x7 + s3 + 2 - MARGIN - 2 * mSxy).toFloat(),
-                (y7 + MARGIN).toFloat(),
+                Offset((x7 + MARGIN - 0 * mSxy).toFloat(), (y7 + s3 - 1 - MARGIN - 2 * mSxy).toFloat()),
+                Offset((x7 + s3 + 2 - MARGIN - 2 * mSxy).toFloat(), (y7 + MARGIN).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 8) {
             // diagonal 8 is from (1,4) to (4,1)
             canvas.drawLine(
-                (x7 + MARGIN + 1 * mSxy).toFloat(),
-                (y7 + s3 - 1 - MARGIN - 0 * mSxy).toFloat(),
-                (x7 + s3 + 2 - MARGIN + 0 * mSxy).toFloat(),
-                (y7 + MARGIN + 1 * mSxy).toFloat(),
+                Offset((x7 + MARGIN + 1 * mSxy).toFloat(), (y7 + s3 - 1 - MARGIN - 0 * mSxy).toFloat()),
+                Offset((x7 + s3 + 2 - MARGIN + 0 * mSxy).toFloat(), (y7 + MARGIN + 1 * mSxy).toFloat()),
                 mWinPaint
             )
         } else if (mWinDiag == 9) {
             // diagonal 9 is from (2,4) to (4,2)
             canvas.drawLine(
-                (x7 + MARGIN + 2 * mSxy).toFloat(),
-                (y7 + s3 - 1 - MARGIN - 0 * mSxy).toFloat(),
-                (x7 + s3 + 2 - MARGIN + 0 * mSxy).toFloat(),
-                (y7 + MARGIN + 2 * mSxy).toFloat(),
+                Offset((x7 + MARGIN + 2 * mSxy).toFloat(), (y7 + s3 - 1 - MARGIN - 0 * mSxy).toFloat()),
+                Offset((x7 + s3 + 2 - MARGIN + 0 * mSxy).toFloat(), (y7 + MARGIN + 2 * mSxy).toFloat()),
                 mWinPaint
             )
         }
 
         //draw the balls on the canvas
-        if (moveModeTouch) {
+        //if (moveModeTouch) {
+        if (1 == 2) {
             for (x in mColorBall.indices) {
                 if (!mColorBall[x]!!.isDisabled) {
                     if (ballMoved == x && mBlinkDisplayOff) continue
-                    mDstRect.offsetTo(mColorBall[x]!!.getCoordX(), mColorBall[x]!!.getCoordY())
-                    canvas.drawBitmap(mColorBall[x]!!.bitmap, mSrcRect, mDstRect, mBmpPaint)
+                    mDstRect.translate(mColorBall[x]!!.getCoordX(), mColorBall[x]!!.getCoordY())
+
+                    val offsetX = mDstRect.left
+                    val offsetY = mDstRect.top
+                    val offsetImage = Offset(offsetX, offsetY)
+
+
+                    canvas.drawImage(mColorBall[x]!!.bitmap, offsetImage, mBmpPaint)
                 }
             }
         } else {
             for (ball in mColorBall) {
                 if (!ball!!.isDisabled) {
-                    mDstRect.offsetTo(ball.getCoordX(), ball.getCoordY())
-                    canvas.drawBitmap(ball.bitmap, mSrcRect, mDstRect, mBmpPaint)
+                    mDstRect.translate(ball.getCoordX(), ball.getCoordY())
+
+                    val offsetX = mDstRect.left
+                    val offsetY = mDstRect.top
+                    val offsetImage = Offset(offsetX, offsetY)
+
+                    canvas.drawImage(ball.bitmap, offsetImage, mBmpPaint)
                 }
             }
         }
     }
 
-    /*
+
     private val mRandom = Random()
     private var mCellListener: ICellListener? = null
 
@@ -526,7 +527,7 @@ class GameView: MyViewModel() {
         }
     }
 
-    private fun initializePlayerTokens(context: Context) {
+    private fun initializePlayerTokens() {
         var portraitLocationXPlayer1 = portraitStartingXPlayer1
         var portraitLocationYPlayer1 = portraitStartingYPlayer1
         var portraitLocationXPlayer2 = portraitStartingXPlayer2
@@ -546,12 +547,11 @@ class GameView: MyViewModel() {
             portraitLocationXPlayer1 += portraitIncrementXPlayer1
             landscapeLocationYPlayer1 += landscapeIncrementYPlayer
             portraitLocationYPlayer1 += portraitIncrementYPlayer1
-            var resource = R.drawable.lib_circlered
+            var resource = Res.drawable.lib_circlered
             if (mGameTokenCard[x] == ColorBall.CROSS) resource =
-                R.drawable.lib_crossred else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
-                R.drawable.lib_circlecrossred
+                Res.drawable.lib_crossred else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
+                Res.drawable.lib_circlecrossred
             mColorBall[x] = ColorBall(
-                context,
                 resource,
                 tokenPointLandscape,
                 tokenPointPortrait,
@@ -567,10 +567,10 @@ class GameView: MyViewModel() {
             portraitLocationXPlayer2 += portraitIncrementXPlayer2
             landscapeLocationYPlayer2 += landscapeIncrementYPlayer
             portraitLocationYPlayer2 += portraitIncrementYPlayer2
-            var resource = R.drawable.lib_circleblue
+            var resource = Res.drawable.lib_circleblue
             if (mGameTokenCard[x] == ColorBall.CROSS) resource =
-                R.drawable.lib_crossblue else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
-                R.drawable.lib_circlecrossblue
+                Res.drawable.lib_crossblue else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
+                Res.drawable.lib_circlecrossblue
             mColorBall[x] = ColorBall(
                 context,
                 resource,
@@ -614,6 +614,7 @@ class GameView: MyViewModel() {
         ball!!.updateBall(tokenType, bitmap!!)
     }
 
+    /*
     fun sendTokensToServer() {
         try {
             val tokenList = JSONObject()
@@ -636,7 +637,7 @@ class GameView: MyViewModel() {
         } catch (e: JSONException) {
             mGameActivity!!.sendToastMessage(e.message)
         }
-    }
+    } */
 
     private fun resetUnusedTokens() {
         for (ball in mColorBall) {
@@ -673,7 +674,7 @@ class GameView: MyViewModel() {
         mWinDiag = diagonal
     }
 
-    private fun getTokenToDraw(location: Int): Bitmap? {
+    private fun getTokenToDraw(location: Int): ImageBitmap {
         var cross = mBmpCrossPlayer1
         var circle = mBmpCirclePlayer1
         var circleCross = mBmpCircleCrossPlayer1
@@ -689,7 +690,7 @@ class GameView: MyViewModel() {
         return tokenToDraw
     }
 
-    private val tokenToDrawCenter: Bitmap?
+    private val tokenToDrawCenter: ImageBitmap
         get() {
             var tokenToDraw = mBmpCircleCenter
             if (boardSpaceValues[BoardSpaceValues.BOARDCENTER] == BoardSpaceValues.CROSS) tokenToDraw =
@@ -865,14 +866,12 @@ class GameView: MyViewModel() {
         return if (cellNumber < 5) 0 else if (cellNumber < 10) 1 else if (cellNumber < 15) 2 else if (cellNumber < 20) 3 else 4
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    fun initializeBoard(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Keep the view squared
-        val w = MeasureSpec.getSize(widthMeasureSpec)
-        val h = MeasureSpec.getSize(heightMeasureSpec)
-        var d = if (w == 0) h else if (h == 0) w else if (w < h) w else h
-        val modeW = MeasureSpec.getMode(widthMeasureSpec)
-        val modeH = MeasureSpec.getMode(heightMeasureSpec)
-        if (modeH == MeasureSpec.EXACTLY && modeW == MeasureSpec.EXACTLY) {
+        val w = widthMeasureSpec
+        val h = heightMeasureSpec
+        val d = if (w == 0) h else if (h == 0) w else if (w < h) w else h
+
             mDisplayMode = ScreenOrientation.LANDSCAPE
             val screenBoardSize = if (w < h) w else h
             //TODO - try to consolidate these 4 if conditions into a single use case
@@ -911,12 +910,17 @@ class GameView: MyViewModel() {
             landscapeLeftMoveXLimitPlayer1 = mSxy * 2
             landscapeStartingXPlayer2 = w - landscapeHumanTokenSelectedOffsetX - mSxy
             mOffsetX = (w - playingBoardWidth) / 2
-            mDstRect[MARGIN, MARGIN, mSxy - MARGIN - 1] = mSxy - MARGIN - 1
-            setMeasuredDimension(w, h)
-        }
+            //mDstRect[MARGIN, MARGIN, mSxy - MARGIN - 1] = mSxy - MARGIN - 1
+            // I believe the above line of code is setting the first 3 integer values of the Rect to the integer value of the right
+            // side of the equal sign, leaving the last value (bottom) at zero?
+            val marginFloat = MARGIN.toFloat()
+            val mSxyFloat = (mSxy - MARGIN - 1).toFloat()
+            mDstRect = Rect(marginFloat, marginFloat, mSxyFloat, 0F)
+            //setMeasuredDimension(w, h)
+
         if (!INITIALIZATIONCOMPLETED) {
             initializeBallPositions()
-            initializePlayerTokens(mContext)
+            initializePlayerTokens()
             INITIALIZATIONCOMPLETED = true
         }
         resetUnusedTokens()
@@ -1055,6 +1059,7 @@ class GameView: MyViewModel() {
         return false
     }
 
+    /*
     private fun moveModeTouch(event: MotionEvent): Boolean {
         val action = event.action
         val X = event.x.toInt()
@@ -1183,7 +1188,7 @@ class GameView: MyViewModel() {
             }
         }
         return false
-    }
+    } */
 
     fun selectSpecificComputerToken(type: Int, offense: Boolean): Int {
         for (x in 0..3) {
@@ -1441,7 +1446,9 @@ class GameView: MyViewModel() {
             BoardSpaceValues.EMPTY,
             BoardSpaceValues.EMPTY
         )
-        private var mSxy = 0
+        private var mSxy = 0 // mSxy = TOKENSIZE + 2
+        private var mOffsetX = 0
+        private var mOffsetY = 0
         var prizeLocation = -1
         private val mPrizeXBoardLocationArray =
             intArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4)
@@ -1462,10 +1469,10 @@ class GameView: MyViewModel() {
             }
         }
 
-        var mBmpCrossPlayer1: Bitmap? = null
-        var mBmpCrossPlayer2: Bitmap? = null
-        var mBmpCirclePlayer1: Bitmap? = null
-        var mBmpCirclePlayer2: Bitmap? = null
+        var mBmpCrossPlayer1: ImageBitmap? = null
+        var mBmpCrossPlayer2: ImageBitmap? = null
+        var mBmpCirclePlayer1: ImageBitmap? = null
+        var mBmpCirclePlayer2: ImageBitmap? = null
 
     }
 
@@ -1473,26 +1480,25 @@ class GameView: MyViewModel() {
         isFocusable = true //necessary for getting the touch events
         requestFocus()
         Companion.resources = resources
-        mContext = context
         sharedPreferences
-        mBmpPrize = getResBitmap(R.drawable.prize_token)
-        mBmpCrossPlayer1 = getResBitmap(R.drawable.lib_crossred)
+        mBmpPrize = getResBitmap(Res.drawable.prize_token)
+        mBmpCrossPlayer1 = getResBitmap(Res.drawable.lib_crossred)
         setTokenColor(mBmpCrossPlayer1!!, mTokenColor1)
-        mBmpCrossPlayer2 = getResBitmap(R.drawable.lib_crossblue)
+        mBmpCrossPlayer2 = getResBitmap(Res.drawable.lib_crossblue)
         setTokenColor(mBmpCrossPlayer2!!, mTokenColor2)
-        mBmpCrossCenter = getResBitmap(R.drawable.lib_crossgreen)
-        mBmpCirclePlayer1 = getResBitmap(R.drawable.lib_circlered)
+        mBmpCrossCenter = getResBitmap(Res.drawable.lib_crossgreen)
+        mBmpCirclePlayer1 = getResBitmap(Res.drawable.lib_circlered)
         setTokenColor(mBmpCirclePlayer1!!, mTokenColor1)
-        mBmpCirclePlayer2 = getResBitmap(R.drawable.lib_circleblue)
+        mBmpCirclePlayer2 = getResBitmap(Res.drawable.lib_circleblue)
         setTokenColor(mBmpCirclePlayer2!!, mTokenColor2)
-        mBmpCircleCenter = getResBitmap(R.drawable.lib_circlegreen)
-        mBmpCircleCrossPlayer1 = getResBitmap(R.drawable.lib_circlecrossred)
+        mBmpCircleCenter = getResBitmap(Res.drawable.lib_circlegreen)
+        mBmpCircleCrossPlayer1 = getResBitmap(Res.drawable.lib_circlecrossred)
         setTokenColor(mBmpCircleCrossPlayer1!!, mTokenColor1)
-        mBmpCircleCrossPlayer2 = getResBitmap(R.drawable.lib_circlecrossblue)
+        mBmpCircleCrossPlayer2 = getResBitmap(Res.drawable.lib_circlecrossblue)
         setTokenColor(mBmpCircleCrossPlayer2!!, mTokenColor2)
-        mBmpCircleCrossCenter = getResBitmap(R.drawable.lib_circlecrossgreen)
-        mBmpAvailableMove = getResBitmap(R.drawable.allowed_move)
-        mBmpTakenMove = getResBitmap(R.drawable.taken_move)
+        mBmpCircleCrossCenter = getResBitmap(Res.drawable.lib_circlecrossgreen)
+        mBmpAvailableMove = getResBitmap(Res.drawable.allowed_move)
+        mBmpTakenMove = getResBitmap(Res.drawable.taken_move)
         mSrcRect[0, 0, mBmpCrossPlayer1!!.width - 1] = mBmpCrossPlayer1!!.height - 1
         if (mBmpAvailableMove != null) {
             mTakenRect[0, 0, mBmpAvailableMove.width - 1] = mBmpAvailableMove.height - 1
@@ -1524,4 +1530,3 @@ class GameView: MyViewModel() {
         INITIALIZATIONCOMPLETED = false
     }
 }
-     */

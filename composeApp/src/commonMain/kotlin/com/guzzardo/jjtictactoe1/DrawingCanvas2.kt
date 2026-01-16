@@ -37,8 +37,8 @@ fun DrawingCanvas2(
     //modifier: Modifier = Modifier.fillMaxSize()
 ) {
     val windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val minHeightDp = windowSizeClass.minHeightDp
-    val minWidthDp = windowSizeClass.minWidthDp
+    //val minHeightDp = windowSizeClass.minHeightDp
+    //val minWidthDp = windowSizeClass.minWidthDp
     // 1. Create the TextMeasurer
     val textMeasurer = rememberTextMeasurer()
     val textToDraw = "Hello KMP 2026"
@@ -70,5 +70,6 @@ fun DrawingCanvas2(
                 textLayoutResult = textLayoutResult,
                 topLeft = topLeft
             )
+            GameView(this, canvasWidth.toInt(), canvasHeight.toInt())
         }
     }
