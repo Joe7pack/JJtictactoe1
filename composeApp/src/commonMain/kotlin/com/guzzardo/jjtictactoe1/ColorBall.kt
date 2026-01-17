@@ -1,16 +1,16 @@
 package com.guzzardo.jjtictactoe1
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
-
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Rect
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PixelMap
+import androidx.compose.ui.graphics.toPixelMap
 import com.guzzardo.jjtictactoe1.GameView.ScreenOrientation
-import jjtictactoe1.composeapp.generated.resources.Res
 
-class ColorBall(drawable: Int, pointLandscape: android.graphics.Point, pointPortrait: android.graphics.Point, displayMode: Int, type: Int, color: Int) {
-    var bitmap: ImageBitmap // the image of the ball
+class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point, displayMode: Int, type: Int, color: Int) {
+    lateinit var bitmap: ImageBitmap // the image of the ball
+    //private val bitmapWidth: Int
     private var coordX: Float = 0F // the current x coordinate at the canvas = 0
     private var coordY: Float = 0F // the current y coordinate at the canvas = 0
     private val startingLandscapeCoordX: Float // the starting x coordinate at the canvas
@@ -20,9 +20,11 @@ class ColorBall(drawable: Int, pointLandscape: android.graphics.Point, pointPort
     private val mDisplayMode: Int //portrait or landscape
     val iD: Int// gives every ball its own id
     var type: Int // circle, cross or circleCross token
-    var isDisabled = false //indicates ball can no longer be moved (finalized placement on board) = false
+    var isDisabled =
+        false //indicates ball can no longer be moved (finalized placement on board) = false
 
-    fun updateBall(type: Int, bitmap: ImageBitmap) {
+    @Composable
+    fun UpdateBall(type: Int, bitmap: ImageBitmap) {
         this.type = type
         this.bitmap = bitmap
         resetPosition(mDisplayMode)
@@ -62,49 +64,46 @@ class ColorBall(drawable: Int, pointLandscape: android.graphics.Point, pointPort
     val rect: Rect
         get() = Rect(coordX, coordY, 0F, 0F)
 
+    //@Composable
+    fun setTokenColor(imageBitmap: ImageBitmap, newColor: Int): PixelMap? {
+
+        val widthX = imageBitmap.width
+        val heightY = imageBitmap.height
+        val pixelArray = IntArray(widthX * heightY)
+        val pixelMap: PixelMap? = imageBitmap.toPixelMap()
+        for (x in pixelArray.indices) {
+            if (pixelArray.get(x) != 0) {
+                pixelArray[x] = newColor
+            }
+        }
+        return pixelMap
+    }
+
     companion object {
-        //@kotlin.jvm.JvmField
-        //var MAXBALLS: Int = 8
         var count = 0
         const val MAXBALLS = 8
         const val CIRCLE = 0
         const val CROSS = 1
         const val CIRCLECROSS = 2
-        //@JvmStatic
-        fun setTokenColor(img: ImageBitmap, newColor: Int) {
-            val width = img.width
-            val height = img.height
-            val pixels = IntArray(width * height)
-            img.readPixels(pixels, 0, width, 0, 0, width, height)
-            for (x in pixels.indices) {
-                if (pixels[x] != 0) {
-                    pixels[x] = newColor
-                }
-            }
-            //img.setPixels(pixels, 0, width, 0, 0, width, height)
-        }
     }
 
-    init {
-        val bitmapOptions = BitmapFactory.Options()
-        bitmapOptions.inMutable = true
-        bitmap = BitmapFactory.decodeResource(context.resources, drawable, bitmapOptions)
+     init {
         setTokenColor(bitmap, color)
         iD = count
         count++
         if (count > MAXBALLS - 1)
             count = 0
         if (displayMode == ScreenOrientation.LANDSCAPE) {
-            coordX = pointLandscape.x
-            coordY = pointLandscape.y
+            coordX = pointLandscape.x.toFloat()
+            coordY = pointLandscape.y.toFloat()
         } else {
-            coordX = pointPortrait.x
-            coordY= pointPortrait.y
+            coordX = pointPortrait.x.toFloat()
+            coordY = pointPortrait.y.toFloat()
         }
-        startingLandscapeCoordX = pointLandscape.x
-        startingLandscapeCoordY = pointLandscape.y
-        startingPortraitCoordX = pointPortrait.x
-        startingPortraitCoordY = pointPortrait.y
+        startingLandscapeCoordX = pointLandscape.x.toFloat()
+        startingLandscapeCoordY = pointLandscape.y.toFloat()
+        startingPortraitCoordX = pointPortrait.x.toFloat()
+        startingPortraitCoordY = pointPortrait.y.toFloat()
         this.type = type
         mDisplayMode = displayMode
     }

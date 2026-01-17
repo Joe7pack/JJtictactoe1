@@ -48,6 +48,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import jjtictactoe1.composeapp.generated.resources.lib_circlecrossgreen
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.getStringArray
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -271,7 +272,7 @@ fun SampleNavigationSuiteScaffoldCustomType() {
 fun HomeDestination() {
     Button(onClick = { /* Do something when clicked */ }) {
         Icon(
-            painter = painterResource(Res.drawable.homeicon),
+            painter = painterResource(Res.drawable.lib_circlecrossgreen),
             contentDescription = stringResource(Res.string.shopping)
         )
 

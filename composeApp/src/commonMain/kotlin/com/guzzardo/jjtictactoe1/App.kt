@@ -53,22 +53,23 @@ fun App() {
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
-                /*
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Image(painterResource(Res.drawable.compose_multiplatform), null)
-                        Text("Compose: $greeting")
-                        Text("Window width: $minWidthDp")
-                        Text("Window height: $minHeightDp")
-                        val resourceName = stringResource(Res.string.favorites)
-                        Text(text = resourceName)
-                        TestFun("joe")
-                        //SampleNavigationSuiteScaffoldParts()
-                        //KmpLineDrawingScreen()
-*/
-                DrawingCanvas2()
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    Text("Compose: $greeting")
+                    //Text("Window width: $minWidthDp")
+                    //Text("Window height: $minHeightDp")
+                    val resourceName = stringResource(Res.string.favorites)
+                    Text(text = resourceName)
+                    //TestFun("joe")
+                    SampleNavigationSuiteScaffoldParts()
+                    //KmpLineDrawingScreen()
+
+                    //DrawingCanvas2()
+                }
             }
         }
     }

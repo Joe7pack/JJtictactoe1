@@ -18,54 +18,33 @@ package com.guzzardo.jjtictactoe1
 
 
 import androidx.compose.ui.geometry.Rect
-import com.guzzardo.jjtictactoe1.ColorBall.Companion.setTokenColor
+//import com.guzzardo.jjtictactoe1.ColorBall.Companion.setTokenColor
 import com.guzzardo.jjtictactoe1.GameActivity.ClientThread
 import com.guzzardo.jjtictactoe1.GameActivity.Companion.moveModeTouch
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.UserPreferences
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.isNetworkAvailable
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.prizesAreAvailable
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.playersTooClose
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.util.*
 import kotlin.math.sqrt
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntRect
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 //import jjtictactoe1.GameView.Companion.TOKENSIZE
 //import com.guzzardo.jjtictactoe1.GameView.Companion.mSxy
 import jjtictactoe1.composeapp.generated.resources.Res
-import jjtictactoe1.composeapp.generated.resources.homeicon
-import jjtictactoe1.composeapp.generated.resources.shopping
-import jjtictactoe1.composeapp.generated.resources.planets_array
-import org.jetbrains.compose.resources.StringArrayResource
+import jjtictactoe1.composeapp.generated.resources.allowed_move
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 
 //import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossblue
@@ -76,7 +55,11 @@ import jjtictactoe1.composeapp.generated.resources.lib_circleblue
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossgreen
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossred
 import jjtictactoe1.composeapp.generated.resources.lib_circlegreen
+import jjtictactoe1.composeapp.generated.resources.lib_circlered
 import jjtictactoe1.composeapp.generated.resources.lib_crossblue
+import jjtictactoe1.composeapp.generated.resources.prize_token
+import jjtictactoe1.composeapp.generated.resources.taken_move
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.random.Random
@@ -131,15 +114,16 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     private val mWinPaint = Paint()
     private val mLinePaint = Paint()
     private val mBmpPaint = Paint()
-    private val mTextPaint = Paint()
-    private val mBmpCrossCenter = ImageBitmap
-    private val mBmpCircleCenter = ImageBitmap
-    private val mBmpCircleCrossCenter = ImageBitmap
-    private val mBmpCircleCrossPlayer1 = ImageBitmap
-    private val mBmpCircleCrossPlayer = ImageBitmap
-    private val mBmpAvailableMove = ImageBitmap
-    private val mBmpTakenMove = ImageBitmap
-    private val mBmpPrize = ImageBitmap
+    private var mTextPaint = Paint()
+    private var mBmpCrossCenter: ImageBitmap.Companion = ImageBitmap
+    private var mBmpCircleCenter: ImageBitmap.Companion = ImageBitmap
+    private var mBmpCircleCrossCenter: ImageBitmap.Companion = ImageBitmap
+    private var mBmpCircleCrossPlayer1: ImageBitmap.Companion = ImageBitmap
+    private var mBmpCircleCrossPlayer2 = Res.drawable.lib_circlecrossred
+    private val mBmpAvailableMove: DrawableResource = Res.drawable.allowed_move
+    private var mBmpTakenMove = Res.drawable.taken_move
+    private val mBmpPrize: ImageBitmap = Res.drawable.prize_token
+    //ImageBitmap = ImageBitmap
 
     interface BoardSpaceValues {
         companion object {
@@ -527,6 +511,16 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         }
     }
 
+    @Composable
+    fun createBitmapFromResource(resource: DrawableResource): ImageBitmap {
+        // The imageResource function is a composable, so it should ideally be called
+        // within a Composable scope. If you need it outside of Compose, you might need
+        // a platform-specific implementation using 'expect/actual' or a third-party library
+        // that handles non-composable resource loading.
+        // For general Compose usage:
+        return imageResource(resource = resource)
+    }
+    @Composable
     private fun initializePlayerTokens() {
         var portraitLocationXPlayer1 = portraitStartingXPlayer1
         var portraitLocationYPlayer1 = portraitStartingYPlayer1
@@ -538,8 +532,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         var landscapeLocationYPlayer2 = landscapeStartingYPlayer2
         setTokenCards()
         setBoardSpaceValue(BoardSpaceValues.BOARDCENTER, mGameTokenCard[NUMBEROFTOKENS - 1])
-        val tokenPointLandscape = Point()
-        val tokenPointPortrait = Point()
+        val tokenPointLandscape = Point(0,0)
+        val tokenPointPortrait = Point(0,0)
+        // Point
         for (x in 0..3) {
             tokenPointLandscape[landscapeLocationXPlayer1] = landscapeLocationYPlayer1
             tokenPointPortrait[portraitLocationXPlayer1] = portraitLocationYPlayer1
@@ -548,11 +543,12 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             landscapeLocationYPlayer1 += landscapeIncrementYPlayer
             portraitLocationYPlayer1 += portraitIncrementYPlayer1
             var resource = Res.drawable.lib_circlered
+            val bitmap = createBitmapFromResource(resource)
             if (mGameTokenCard[x] == ColorBall.CROSS) resource =
                 Res.drawable.lib_crossred else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
                 Res.drawable.lib_circlecrossred
             mColorBall[x] = ColorBall(
-                resource,
+                bitmap,
                 tokenPointLandscape,
                 tokenPointPortrait,
                 mDisplayMode,
@@ -589,7 +585,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     }
 
     fun updatePlayerToken(id: Int, tokenType: Int) {
-        var bitmap: Bitmap? //= null
+        var bitmap: ImageBitmap? //= null
         if (id < 4) {
             bitmap = mBmpCirclePlayer1
             //resource = R.drawable.lib_circlered;
@@ -1326,7 +1322,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         }
     }
 
-    private fun getResBitmap(bmpResId: Int): Bitmap? {
+    private fun getResBitmap(bmpResId: DrawableResource): ImageBitmap? {
         val opts = BitmapFactory.Options()
         opts.inMutable = true
         var bmp = BitmapFactory.decodeResource(resources, bmpResId, opts)
@@ -1468,18 +1464,15 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 Log.d(filter, msg)
             }
         }
-
         var mBmpCrossPlayer1: ImageBitmap? = null
         var mBmpCrossPlayer2: ImageBitmap? = null
         var mBmpCirclePlayer1: ImageBitmap? = null
         var mBmpCirclePlayer2: ImageBitmap? = null
-
     }
 
     init {
         isFocusable = true //necessary for getting the touch events
         requestFocus()
-        Companion.resources = resources
         sharedPreferences
         mBmpPrize = getResBitmap(Res.drawable.prize_token)
         mBmpCrossPlayer1 = getResBitmap(Res.drawable.lib_crossred)
@@ -1493,7 +1486,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         setTokenColor(mBmpCirclePlayer2!!, mTokenColor2)
         mBmpCircleCenter = getResBitmap(Res.drawable.lib_circlegreen)
         mBmpCircleCrossPlayer1 = getResBitmap(Res.drawable.lib_circlecrossred)
-        setTokenColor(mBmpCircleCrossPlayer1!!, mTokenColor1)
+        setTokenColor(mBmpCircleCrossPlayer1, mTokenColor1)
         mBmpCircleCrossPlayer2 = getResBitmap(Res.drawable.lib_circlecrossblue)
         setTokenColor(mBmpCircleCrossPlayer2!!, mTokenColor2)
         mBmpCircleCrossCenter = getResBitmap(Res.drawable.lib_circlecrossgreen)
