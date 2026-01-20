@@ -71,5 +71,6 @@ fun DrawingCanvas2(
                 topLeft = topLeft
             )
             GameView(this, canvasWidth.toInt(), canvasHeight.toInt())
+            DrawAvailableSquare(this, 0, 0)
         }
     }

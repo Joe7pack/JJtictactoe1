@@ -14,15 +14,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass
+import com.guzzardo.jjtictactoe1.GameView.Companion.mBmpCrossPlayer1
+import com.guzzardo.jjtictactoe1.ColorBall.Companion
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
 import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.compose_multiplatform
-
 import jjtictactoe1.composeapp.generated.resources.favorites
 import jjtictactoe1.composeapp.generated.resources.planets_array
 import org.jetbrains.compose.resources.stringArrayResource
@@ -67,20 +68,17 @@ fun App() {
                     //TestFun("joe")
                     SampleNavigationSuiteScaffoldParts()
                     //KmpLineDrawingScreen()
-
-                    //DrawingCanvas2()
+                    DrawingCanvas2()
+                    TestImage()
+                    //InitializeGame()
+                    //setTokenColor(mBmpCrossPlayer1, 0)
                 }
             }
         }
     }
 }
-                            /*paths = state.paths,
-                            currentPath = state.currentPath,
-                            onAction = viewModel::onAction,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) */
+
+
 
 
 

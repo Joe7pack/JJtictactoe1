@@ -14,13 +14,8 @@ package com.guzzardo.jjtictactoe1
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 import androidx.compose.ui.geometry.Rect
-//import com.guzzardo.jjtictactoe1.ColorBall.Companion.setTokenColor
 import com.guzzardo.jjtictactoe1.GameActivity.ClientThread
-import com.guzzardo.jjtictactoe1.GameActivity.Companion.moveModeTouch
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.UserPreferences
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.isNetworkAvailable
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.prizesAreAvailable
@@ -35,17 +30,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.viewmodel.compose.viewModel
+//import com.guzzardo.jjtictactoe1.SetTokenColor
 //import jjtictactoe1.GameView.Companion.TOKENSIZE
 //import com.guzzardo.jjtictactoe1.GameView.Companion.mSxy
 import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.allowed_move
 import org.jetbrains.compose.resources.painterResource
-
 //import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossblue
 import jjtictactoe1.composeapp.generated.resources.lib_circlered
@@ -55,7 +54,6 @@ import jjtictactoe1.composeapp.generated.resources.lib_circleblue
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossgreen
 import jjtictactoe1.composeapp.generated.resources.lib_circlecrossred
 import jjtictactoe1.composeapp.generated.resources.lib_circlegreen
-import jjtictactoe1.composeapp.generated.resources.lib_circlered
 import jjtictactoe1.composeapp.generated.resources.lib_crossblue
 import jjtictactoe1.composeapp.generated.resources.prize_token
 import jjtictactoe1.composeapp.generated.resources.taken_move
@@ -100,7 +98,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     private var mViewDisabled = false
     private val mSrcRect = Rect
     private var mDstRect = Rect(0F,0F,0F,0F)
-    private val mTakenRect = Rect
+    private var mTakenRect: Offset = Offset(0F,0F)
     private var mOffsetX = 0
     private var mOffsetY = 0
 /*  } need to remove this end brace before uncommenting rest of this class!!! */
@@ -113,16 +111,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
 
     private val mWinPaint = Paint()
     private val mLinePaint = Paint()
-    private val mBmpPaint = Paint()
+    private var mBmpPaint = Paint()
     private var mTextPaint = Paint()
-    private var mBmpCrossCenter: ImageBitmap.Companion = ImageBitmap
-    private var mBmpCircleCenter: ImageBitmap.Companion = ImageBitmap
-    private var mBmpCircleCrossCenter: ImageBitmap.Companion = ImageBitmap
-    private var mBmpCircleCrossPlayer1: ImageBitmap.Companion = ImageBitmap
-    private var mBmpCircleCrossPlayer2 = Res.drawable.lib_circlecrossred
-    private val mBmpAvailableMove: DrawableResource = Res.drawable.allowed_move
-    private var mBmpTakenMove = Res.drawable.taken_move
-    private val mBmpPrize: ImageBitmap = Res.drawable.prize_token
+
     //ImageBitmap = ImageBitmap
 
     interface BoardSpaceValues {
@@ -152,8 +143,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     private var mBlinkDisplayOff = false
     private val mBlinkRect = IntRect
 
-    fun drawGameBoard(canvas: Canvas, canvasWidth: Int, canvasHeight: Int) {
-        initializeBoard(canvasWidth, canvasHeight)
+    @Composable
+    fun DrawGameBoard(canvas: Canvas, canvasWidth: Int, canvasHeight: Int) {
+        InitializeBoard(canvasWidth, canvasHeight)
         val s3 = mSxy * 5
         val x7 = mOffsetX
         val y7 = mOffsetY
@@ -177,7 +169,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 k += mSxy
             }
         }
-        setAvailableMoves(canvas, mSelectedCell, boardSpaceValues, boardSpaceAvailableValues)
+        SetAvailableMoves(canvas, mSelectedCell, boardSpaceValues, boardSpaceAvailableValues)
         val prizeDrawn = false
         //if (moveModeTouch) {
         if (1 == 2) {
@@ -382,7 +374,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     }
 
 
-    private val mRandom = Random()
+    private val mRandom = Random
     private var mCellListener: ICellListener? = null
 
     private val mColorBall = arrayOfNulls<ColorBall>(ColorBall.MAXBALLS) // array that holds the balls
@@ -458,7 +450,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         }
     }
 
-    fun initalizeGameValues() {
+    @Composable
+    fun InitializeGameValues() {
         for (x in data.indices) {
             data[x] = State.EMPTY
             boardSpaceValues[x] = BoardSpaceValues.EMPTY
@@ -521,7 +514,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         return imageResource(resource = resource)
     }
     @Composable
-    private fun initializePlayerTokens() {
+    private fun InitializePlayerTokens() {
         var portraitLocationXPlayer1 = portraitStartingXPlayer1
         var portraitLocationYPlayer1 = portraitStartingYPlayer1
         var portraitLocationXPlayer2 = portraitStartingXPlayer2
@@ -535,6 +528,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         val tokenPointLandscape = Point(0,0)
         val tokenPointPortrait = Point(0,0)
         // Point
+        var bitmap = createBitmapFromResource(Res.drawable.lib_circlered)
         for (x in 0..3) {
             tokenPointLandscape[landscapeLocationXPlayer1] = landscapeLocationYPlayer1
             tokenPointPortrait[portraitLocationXPlayer1] = portraitLocationYPlayer1
@@ -542,11 +536,11 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             portraitLocationXPlayer1 += portraitIncrementXPlayer1
             landscapeLocationYPlayer1 += landscapeIncrementYPlayer
             portraitLocationYPlayer1 += portraitIncrementYPlayer1
-            var resource = Res.drawable.lib_circlered
-            val bitmap = createBitmapFromResource(resource)
-            if (mGameTokenCard[x] == ColorBall.CROSS) resource =
-                Res.drawable.lib_crossred else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
-                Res.drawable.lib_circlecrossred
+
+            if (mGameTokenCard[x] == ColorBall.CROSS)
+                bitmap = createBitmapFromResource(Res.drawable.lib_crossred)
+            else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) bitmap =
+                createBitmapFromResource(Res.drawable.lib_circlecrossred)
             mColorBall[x] = ColorBall(
                 bitmap,
                 tokenPointLandscape,
@@ -563,13 +557,12 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             portraitLocationXPlayer2 += portraitIncrementXPlayer2
             landscapeLocationYPlayer2 += landscapeIncrementYPlayer
             portraitLocationYPlayer2 += portraitIncrementYPlayer2
-            var resource = Res.drawable.lib_circleblue
-            if (mGameTokenCard[x] == ColorBall.CROSS) resource =
-                Res.drawable.lib_crossblue else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) resource =
-                Res.drawable.lib_circlecrossblue
+            bitmap = createBitmapFromResource(Res.drawable.lib_circleblue)
+            if (mGameTokenCard[x] == ColorBall.CROSS) bitmap =
+                createBitmapFromResource(Res.drawable.lib_crossblue) else if (mGameTokenCard[x] == ColorBall.CIRCLECROSS) bitmap =
+                createBitmapFromResource(Res.drawable.lib_circlecrossblue)
             mColorBall[x] = ColorBall(
-                context,
-                resource,
+                bitmap,
                 tokenPointLandscape,
                 tokenPointPortrait,
                 mDisplayMode,
@@ -584,7 +577,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 "Opposing player Name:  ${GameActivity.mPlayer2Name}")
     }
 
-    fun updatePlayerToken(id: Int, tokenType: Int) {
+    @Composable
+    fun UpdatePlayerToken(id: Int, tokenType: Int) {
         var bitmap: ImageBitmap? //= null
         if (id < 4) {
             bitmap = mBmpCirclePlayer1
@@ -607,7 +601,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             }
         }
         val ball = mColorBall[id]
-        ball!!.updateBall(tokenType, bitmap!!)
+        ball!!.UpdateBall(tokenType, bitmap!!)
     }
 
     /*
@@ -670,7 +664,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         mWinDiag = diagonal
     }
 
-    private fun getTokenToDraw(location: Int): ImageBitmap {
+    private fun getTokenToDraw(location: Int): ImageBitmap? {
         var cross = mBmpCrossPlayer1
         var circle = mBmpCirclePlayer1
         var circleCross = mBmpCircleCrossPlayer1
@@ -686,9 +680,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         return tokenToDraw
     }
 
-    private val tokenToDrawCenter: ImageBitmap
+    private val tokenToDrawCenter: ImageBitmap?
         get() {
-            var tokenToDraw = mBmpCircleCenter
+            var tokenToDraw: ImageBitmap? = mBmpCircleCenter
             if (boardSpaceValues[BoardSpaceValues.BOARDCENTER] == BoardSpaceValues.CROSS) tokenToDraw =
                 mBmpCrossCenter else if (boardSpaceValues[BoardSpaceValues.BOARDCENTER] == BoardSpaceValues.CIRCLECROSS) tokenToDraw =
                 mBmpCircleCrossCenter
@@ -697,18 +691,16 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
 
     private fun drawPlayerToken(canvas: Canvas, location: Int) {
         if (boardSpaceValues[location] != BoardSpaceValues.EMPTY) {
-            canvas.drawBitmap(
-                mBmpTakenMove!!,
+            canvas.drawImage(
+                mBmpTakenMove,
                 mTakenRect,
-                mDstRect,
-                mBmpPaint
+                                mBmpPaint
             ) //revert background to black
             val tokenToDraw = getTokenToDraw(location)
-            canvas.drawBitmap(tokenToDraw!!, mSrcRect, mDstRect, mBmpPaint)
+            val offset = Offset(mDstRect.left, mDstRect.top)
+            canvas.drawImage(tokenToDraw!!, offset, mBmpPaint)
         }
     }
-
-
 
     private fun calculateLeftLimit(boardSpaceValue: IntArray): Int {
         run {
@@ -777,23 +769,26 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             if (selectedCell == x) continue
             boardSpaceAvailable[x] = SPACENOTAVAILABLE
             if (canvas != null) {
-                mDstRect.offsetTo(
-                    MARGIN + mOffsetX + mSxy * xValue,
-                    MARGIN + mOffsetY + mSxy * yValue
+                mDstRect.translate(
+                    (MARGIN + mOffsetX + mSxy * xValue).toFloat(),
+                    (MARGIN + mOffsetY + mSxy * yValue).toFloat()
                 )
-                canvas.drawBitmap(mBmpTakenMove!!, mTakenRect, mDstRect, null)
+                canvas.drawImage(mBmpTakenMove, mTakenRect, mDstRect)
             }
         }
     }
 
-    fun setAvailableMoves(selectedCell: Int, boardSpaceValue: IntArray, boardSpaceAvailable: BooleanArray) {
+    /*
+    fun SetAvailableMoves(selectedCell: Int, boardSpaceValue: IntArray, boardSpaceAvailable: BooleanArray) {
         setAvailableMoves(null, selectedCell, boardSpaceValue, boardSpaceAvailable)
     }
+     */
 
     //	if the position checked is occupied determine if left, right, up and down exist
     //	for each direction that exists check if its already occupied
     //	if its not, then its available
-    private fun setAvailableMoves(canvas: Canvas?, selectedCell: Int, boardSpaceValue: IntArray, boardSpaceAvailable: BooleanArray) {
+    @Composable
+    private fun SetAvailableMoves(canvas: Canvas?, selectedCell: Int, boardSpaceValue: IntArray, boardSpaceAvailable: BooleanArray) {
         resetAvailableMoves(canvas, boardSpaceAvailable, selectedCell)
         val leftLimit = calculateLeftLimit(boardSpaceValue)
         val rightLimit = calculateRightLimit(boardSpaceValue)
@@ -816,7 +811,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             if (leftExists) {
                 if (xValue > leftLimit) if (boardSpaceValue[x - 1] == -1 && selectedCell != x - 1) {
                     if (canvas != null) {
-                        drawAvailableSquare(canvas, xValue - 1, yValue)
+                        DrawAvailableSquare(canvas, xValue - 1, yValue)
                     }
                     boardSpaceAvailable[x - 1] = true
                 }
@@ -824,7 +819,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             if (rightExists) {
                 if (xValue < rightLimit) if (boardSpaceValue[x + 1] == -1 && selectedCell != x + 1) {
                     if (canvas != null) {
-                        drawAvailableSquare(canvas, xValue + 1, yValue)
+                        DrawAvailableSquare(canvas, xValue + 1, yValue)
                     }
                     boardSpaceAvailable[x + 1] = true
                 }
@@ -833,7 +828,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 if (yValue > topLimit) {
                     if (boardSpaceValue[x - 5] == -1 && selectedCell != x - 5) {
                         if (canvas != null) {
-                            drawAvailableSquare(canvas, xValue, yValue - 1)
+                            DrawAvailableSquare(canvas, xValue, yValue - 1)
                         }
                         boardSpaceAvailable[x - 5] = true
                     }
@@ -843,7 +838,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 if (yValue < bottomLimit) {
                     if (boardSpaceValue[x + 5] == -1 && selectedCell != x + 5) {
                         if (canvas != null) {
-                            drawAvailableSquare(canvas, xValue, yValue + 1)
+                            DrawAvailableSquare(canvas, xValue, yValue + 1)
                         }
                         boardSpaceAvailable[x + 5] = true
                     }
@@ -852,9 +847,14 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         }
     }
 
-    private fun drawAvailableSquare(canvas: Canvas, xValue: Int, yValue: Int) {
-        mDstRect.offsetTo(MARGIN + mOffsetX + mSxy * xValue, MARGIN + mOffsetY + mSxy * yValue)
-        canvas.drawBitmap(mBmpAvailableMove!!, mTakenRect, mDstRect, null)
+    @Composable
+    private fun DrawAvailableSquare(canvas: Canvas, xValue: Int, yValue: Int) {
+        val offset = Offset((MARGIN + mOffsetX + mSxy * xValue).toFloat(),
+            (MARGIN + mOffsetY + mSxy * yValue).toFloat()
+        )
+
+        //mDstRect.offsetTo(MARGIN + mOffsetX + mSxy * xValue, MARGIN + mOffsetY + mSxy * yValue)
+        canvas.drawImage(mBmpAvailableMove, offset, mDstRect, null)
     }
 
     //calculate the Y offset given the cell position on the game board
@@ -862,7 +862,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         return if (cellNumber < 5) 0 else if (cellNumber < 10) 1 else if (cellNumber < 15) 2 else if (cellNumber < 20) 3 else 4
     }
 
-    fun initializeBoard(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    @Composable
+    fun InitializeBoard(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Keep the view squared
         val w = widthMeasureSpec
         val h = heightMeasureSpec
@@ -916,7 +917,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
 
         if (!INITIALIZATIONCOMPLETED) {
             initializeBallPositions()
-            initializePlayerTokens()
+            InitializePlayerTokens()
             INITIALIZATIONCOMPLETED = true
         }
         resetUnusedTokens()
@@ -974,9 +975,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             Y = event.y.toInt()
             // move the balls the same as the finger
             if (ballMoved > -1) {
-                if (X > leftLimit && X < rightLimit) mColorBall[ballMoved]!!.setCoordX(X - 25)
+                if (X > leftLimit && X < rightLimit) mColorBall[ballMoved]!!.setCoordX(X-25)
                 if (Y > 25 && Y < BoardLowerLimit) mColorBall[ballMoved]!!
-                    .setCoordY(Y - 25)
+                    .setCoordY(Y-25F)
             }
             invalidate()
             return true
@@ -1046,16 +1047,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             invalidate()
             return true
         }
-        this.performClick() //added to eliminate warning message: onTouch should call View#performClick when a click is detected
         return false
     }
 
-    override fun performClick(): Boolean { //added to eliminate warning message: onTouch should call View#performClick when a click is detected
-        super.performClick()
-        return false
-    }
-
-    /*
     private fun moveModeTouch(event: MotionEvent): Boolean {
         val action = event.action
         val X = event.x.toInt()
@@ -1184,7 +1178,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             }
         }
         return false
-    } */
+    }
 
     fun selectSpecificComputerToken(type: Int, offense: Boolean): Int {
         for (x in 0..3) {
@@ -1269,7 +1263,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         val hadSelection = mSelectedCell != -1 && mSelectedValue != State.EMPTY
         mSelectedCell = -1
         mSelectedValue = State.EMPTY
-        if (!mBlinkRect.isEmpty) {
+        if (!mBlinkRect.isEmpty()) {
             invalidate()
         }
         mBlinkDisplayOff = false
@@ -1322,22 +1316,6 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         }
     }
 
-    private fun getResBitmap(bmpResId: DrawableResource): ImageBitmap? {
-        val opts = BitmapFactory.Options()
-        opts.inMutable = true
-        var bmp = BitmapFactory.decodeResource(resources, bmpResId, opts)
-        if (bmp == null && isInEditMode) {
-            val d = ResourcesCompat.getDrawable(resources, bmpResId, null)
-            val w = d!!.intrinsicWidth
-            val h = d.intrinsicHeight
-            bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            val c = Canvas(bmp)
-            d.setBounds(0, 0, w - 1, h - 1)
-            d.draw(c)
-        }
-        return bmp
-    }
-
     fun disableBall() {
         if (ballMoved > -1) {
             mColorBall[ballMoved]!!.isDisabled = true
@@ -1368,13 +1346,68 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             mTokenColor2 = settings.getInt(GameActivity.TOKEN_COLOR_2, Color.BLUE)
         }
 
+
+    @Composable
+    //think about putting this back in ColorBall class once I have refactored this class to be called from the UI
+    fun SetTokenColor(imageBitmap: ImageBitmap, newColor: Int) {
+        val widthX = imageBitmap.width
+        val heightY = imageBitmap.height
+        val pixelArray = IntArray(widthX * heightY)
+        val pixelMap: PixelMap? = imageBitmap.toPixelMap()
+        for (x in pixelArray.indices) {
+            if (pixelArray.get(x) != 0) {
+                pixelArray[x] = newColor
+            }
+        }
+        //return pixelMap
+    }
+
+    @Composable
+    private fun getResBitmapXYZ(bmpResId: ImageBitmap): ImageBitmap? {
+        val bitmap = createBitmapFromResource(bmpResId)
+        return bitmap
+    }
+
+    @Composable
+    fun InitializeGame() {
+        mBmpPrize = createBitmapFromResource(Res.drawable.prize_token)
+        mBmpCrossPlayer1 = createBitmapFromResource(Res.drawable.lib_crossred)
+        SetTokenColor(mBmpCrossPlayer1!!, mTokenColor1)
+        mBmpCrossPlayer2 = createBitmapFromResource(Res.drawable.lib_crossblue)
+        SetTokenColor(mBmpCrossPlayer2!!, mTokenColor2)
+        mBmpCrossCenter = createBitmapFromResource(Res.drawable.lib_crossgreen)
+        mBmpCirclePlayer1 = createBitmapFromResource(Res.drawable.lib_circlered)
+        SetTokenColor(mBmpCirclePlayer1!!, mTokenColor1)
+        mBmpCirclePlayer2 = createBitmapFromResource(Res.drawable.lib_circleblue)
+        SetTokenColor(mBmpCirclePlayer2!!, mTokenColor2)
+        mBmpCircleCenter = createBitmapFromResource(Res.drawable.lib_circlegreen)
+        mBmpCircleCrossPlayer1 = createBitmapFromResource(Res.drawable.lib_circlecrossred)
+        SetTokenColor(mBmpCircleCrossPlayer1!!, mTokenColor1)
+        mBmpCircleCrossPlayer2 = createBitmapFromResource(Res.drawable.lib_circlecrossblue)
+        SetTokenColor(mBmpCircleCrossPlayer2!!, mTokenColor2)
+        mBmpCircleCrossCenter = createBitmapFromResource(Res.drawable.lib_circlecrossgreen)
+        mBmpAvailableMove = createBitmapFromResource(Res.drawable.allowed_move)
+        mBmpTakenMove = createBitmapFromResource(Res.drawable.taken_move)
+        mSrcRect[0, 0, mBmpCrossPlayer1!!.width - 1] = mBmpCrossPlayer1!!.height - 1
+        mTakenRect[0, 0, mBmpAvailableMove.width - 1] = mBmpAvailableMove.height - 1
+        mLinePaint.color = Color.Blue
+        mLinePaint.strokeWidth = GRIDLINEWIDTH.toFloat()
+        mLinePaint.style = PaintingStyle.Stroke
+        //mWinPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mWinPaint.color = Color.Yellow
+        mWinPaint.strokeWidth = 5f // was 10
+        mWinPaint.style = PaintingStyle.Stroke
+        mTextPaint.color = Color.Green
+        mTextPaint.strokeWidth = 1f
+        mTextPaint.style = PaintingStyle.Stroke
+        InitializeGameValues()
+    }
+
     companion object {
         const val FPS_MS = (1000 / 2).toLong()
-
         //constants related to gameBoard drawing:
         private const val MARGIN = 5
         private const val GRIDLINEWIDTH = 4
-
         //TODO - calculate these 3 values in onMeasure
         private var TOKENSIZE = 0 // bitmap pixel size of X or O card on board
         private var mTokenRadius =
@@ -1468,58 +1501,26 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         var mBmpCrossPlayer2: ImageBitmap? = null
         var mBmpCirclePlayer1: ImageBitmap? = null
         var mBmpCirclePlayer2: ImageBitmap? = null
+        var mBmpCrossCenter: ImageBitmap? = null
+        var mBmpCircleCenter: ImageBitmap? = null
+        var mBmpCircleCrossCenter: ImageBitmap? = null
+        var mBmpCircleCrossPlayer1: ImageBitmap? = null
+        var mBmpCircleCrossPlayer2: ImageBitmap? = null
+        lateinit var mBmpAvailableMove: ImageBitmap
+        lateinit var mBmpTakenMove: ImageBitmap
+        lateinit var mBmpPrize: ImageBitmap
     }
 
     init {
         isFocusable = true //necessary for getting the touch events
         requestFocus()
         sharedPreferences
-        mBmpPrize = getResBitmap(Res.drawable.prize_token)
-        mBmpCrossPlayer1 = getResBitmap(Res.drawable.lib_crossred)
-        setTokenColor(mBmpCrossPlayer1!!, mTokenColor1)
-        mBmpCrossPlayer2 = getResBitmap(Res.drawable.lib_crossblue)
-        setTokenColor(mBmpCrossPlayer2!!, mTokenColor2)
-        mBmpCrossCenter = getResBitmap(Res.drawable.lib_crossgreen)
-        mBmpCirclePlayer1 = getResBitmap(Res.drawable.lib_circlered)
-        setTokenColor(mBmpCirclePlayer1!!, mTokenColor1)
-        mBmpCirclePlayer2 = getResBitmap(Res.drawable.lib_circleblue)
-        setTokenColor(mBmpCirclePlayer2!!, mTokenColor2)
-        mBmpCircleCenter = getResBitmap(Res.drawable.lib_circlegreen)
-        mBmpCircleCrossPlayer1 = getResBitmap(Res.drawable.lib_circlecrossred)
-        setTokenColor(mBmpCircleCrossPlayer1, mTokenColor1)
-        mBmpCircleCrossPlayer2 = getResBitmap(Res.drawable.lib_circlecrossblue)
-        setTokenColor(mBmpCircleCrossPlayer2!!, mTokenColor2)
-        mBmpCircleCrossCenter = getResBitmap(Res.drawable.lib_circlecrossgreen)
-        mBmpAvailableMove = getResBitmap(Res.drawable.allowed_move)
-        mBmpTakenMove = getResBitmap(Res.drawable.taken_move)
-        mSrcRect[0, 0, mBmpCrossPlayer1!!.width - 1] = mBmpCrossPlayer1!!.height - 1
-        if (mBmpAvailableMove != null) {
-            mTakenRect[0, 0, mBmpAvailableMove.width - 1] = mBmpAvailableMove.height - 1
-        }
-        mBmpPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mLinePaint = Paint()
-        mLinePaint.color = -0x100
-        mLinePaint.strokeWidth = GRIDLINEWIDTH.toFloat()
-        mLinePaint.style = Paint.Style.STROKE
-        mWinPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mWinPaint.color = -0x10000
-        mWinPaint.strokeWidth = 5f // was 10
-        mWinPaint.style = Paint.Style.STROKE
-        mTextPaint = Paint()
-        mTextPaint.color = -0x10000
-        mTextPaint.strokeWidth = 1f
-        mTextPaint.style = Paint.Style.STROKE
-        initalizeGameValues()
-        if (isInEditMode) {
-            // In edit mode (e.g. in the Eclipse ADT graphical layout editor)
-            // we'll use some random data to display the state.
-            for (i in data.indices) {
-                data[i] = State.fromInt(mRandom.nextInt(3))
-            }
-        }
+
         computerMove = 4 //temporary value for determining next token for computer to move
         mPlayer1TokenChoice = -1
         mPlayer2TokenChoice = -1
         INITIALIZATIONCOMPLETED = false
     }
 }
+
+

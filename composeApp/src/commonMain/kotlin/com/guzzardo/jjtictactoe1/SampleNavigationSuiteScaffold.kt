@@ -137,8 +137,8 @@ fun TestFun(menuString: String) {
 
     Row() {
         //SampleNavigationSuiteScaffoldParts()
-       //MyScreen()
-        //TestImage()
+       MyScreen()
+        TestImage()
     }
 }
 

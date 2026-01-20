@@ -3,9 +3,6 @@ package com.guzzardo.jjtictactoe1
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PixelMap
-import androidx.compose.ui.graphics.toPixelMap
 import com.guzzardo.jjtictactoe1.GameView.ScreenOrientation
 
 class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point, displayMode: Int, type: Int, color: Int) {
@@ -18,7 +15,7 @@ class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point
     private val startingPortraitCoordX: Float // the starting x coordinate at the canvas
     private val startingPortraitCoordY: Float // the starting y coordinate at the canvas
     private val mDisplayMode: Int //portrait or landscape
-    val iD: Int// gives every ball its own id
+    val iD: Int // gives every ball its own id
     var type: Int // circle, cross or circleCross token
     var isDisabled =
         false //indicates ball can no longer be moved (finalized placement on board) = false
@@ -64,21 +61,6 @@ class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point
     val rect: Rect
         get() = Rect(coordX, coordY, 0F, 0F)
 
-    //@Composable
-    fun setTokenColor(imageBitmap: ImageBitmap, newColor: Int): PixelMap? {
-
-        val widthX = imageBitmap.width
-        val heightY = imageBitmap.height
-        val pixelArray = IntArray(widthX * heightY)
-        val pixelMap: PixelMap? = imageBitmap.toPixelMap()
-        for (x in pixelArray.indices) {
-            if (pixelArray.get(x) != 0) {
-                pixelArray[x] = newColor
-            }
-        }
-        return pixelMap
-    }
-
     companion object {
         var count = 0
         const val MAXBALLS = 8
@@ -88,7 +70,7 @@ class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point
     }
 
      init {
-        setTokenColor(bitmap, color)
+        //setTokenColor(bitmap, color)
         iD = count
         count++
         if (count > MAXBALLS - 1)

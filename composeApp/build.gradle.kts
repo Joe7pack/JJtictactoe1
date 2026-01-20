@@ -35,8 +35,6 @@ kotlin {
             implementation(compose.components.resources)
             // Use the latest stable version instead of 2.8.0 if a newer one is available
             implementation(libs.lifecycle.viewmodel.compose)
-
-
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -44,9 +42,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            //implementation(libs.androidx.lifecycle.viewmodelCompose)
             //implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.lifecycle.viewmodel.compose)
             implementation(projects.shared)
         }
         commonTest.dependencies {
@@ -83,7 +79,11 @@ android {
 }
 
 dependencies {
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(compose.uiTooling)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.material.icons.core)
@@ -93,9 +93,6 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling.preview)
-    debugImplementation(libs.androidx.ui.tooling)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.runtime.rxjava2)
