@@ -3,9 +3,10 @@ package com.guzzardo.jjtictactoe1
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import com.guzzardo.jjtictactoe1.GameView.ScreenOrientation
 
-class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point, displayMode: Int, type: Int, color: Int) {
+class ColorBall(bitmap: ImageBitmap, pointLandscape: Point, pointPortrait: Point, displayMode: Int, type: Int, color: Color) {
     lateinit var bitmap: ImageBitmap // the image of the ball
     //private val bitmapWidth: Int
     private var coordX: Float = 0F // the current x coordinate at the canvas = 0

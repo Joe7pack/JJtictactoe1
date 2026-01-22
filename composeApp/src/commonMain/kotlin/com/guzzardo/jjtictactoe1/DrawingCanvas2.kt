@@ -1,33 +1,19 @@
 package com.guzzardo.jjtictactoe1
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 //import  androidx.compose.material3
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastForEach
 import androidx.window.core.layout.WindowSizeClass
-import kotlin.math.abs
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.ui.draw.drawBehind
 
 @Composable
 fun DrawingCanvas2(
@@ -70,7 +56,7 @@ fun DrawingCanvas2(
                 textLayoutResult = textLayoutResult,
                 topLeft = topLeft
             )
-            GameView(this, canvasWidth.toInt(), canvasHeight.toInt())
+            GameView(this, canvasWidth.toInt(), canvasHeight.toInt(), TODO())
             DrawAvailableSquare(this, 0, 0)
         }
     }

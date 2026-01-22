@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -59,6 +61,7 @@ import jjtictactoe1.composeapp.generated.resources.prize_token
 import jjtictactoe1.composeapp.generated.resources.taken_move
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.random.Random
 
@@ -79,7 +82,14 @@ fun TestImage(viewModel: MyViewModel = viewModel { MyViewModel() }) {
 }
 
 //class GameView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
-class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewModel() {
+class GameView(
+    canvas: DrawScope,
+    canvasWidth: Int,
+    canvasHeight: Int,
+    tokenColor1: Color,
+    tokenColor2: Color
+
+): MyViewModel() {
     enum class State(val value: Int) {
         UNKNOWN(-3), WIN(-2), EMPTY(0), PLAYER1(1), PLAYER2(2), PLAYERBOTH(3);
 
@@ -96,14 +106,14 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     }
 
     private var mViewDisabled = false
-    private val mSrcRect = Rect
+    //private val mSrcRect = Rect
     private var mDstRect = Rect(0F,0F,0F,0F)
-    private var mTakenRect: Offset = Offset(0F,0F)
+    //private var mTakenRect = Rect //: Offset = Offset(0F,0F)
     private var mOffsetX = 0
     private var mOffsetY = 0
 /*  } need to remove this end brace before uncommenting rest of this class!!! */
 
-//private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to make token blink
+private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to make token blink
 
 // Paint class is a fundamental component of Android's 2D drawing framework. It holds the style and color information about
 // how to draw shapes, text, and bitmaps to a Canvas.
@@ -113,6 +123,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     private val mLinePaint = Paint()
     private var mBmpPaint = Paint()
     private var mTextPaint = Paint()
+    private var mTokenColor1 = tokenColor1
+    private var mTokenColor2 = tokenColor2
+    private var mBlinkRect = IntRect(0,0,0,0)
 
     //ImageBitmap = ImageBitmap
 
@@ -141,7 +154,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
     private var mWinRow = -1
     private var mWinDiag = -1
     private var mBlinkDisplayOff = false
-    private val mBlinkRect = IntRect
+    //private val mBlinkRect = IntRect
 
     @Composable
     fun DrawGameBoard(canvas: Canvas, canvasWidth: Int, canvasHeight: Int) {
@@ -195,8 +208,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         val offsetX = mDstRect.left
         val offsetY = mDstRect.top
         val offsetImage = Offset(offsetX, offsetY)
-        val tokenToDraw: ImageBitmap = tokenToDrawCenter
-        canvas.drawImage(tokenToDraw, offsetImage, mBmpPaint)
+        val tokenToDraw: ImageBitmap? = tokenToDrawCenter
+        canvas.drawImage(tokenToDraw!!, offsetImage, mBmpPaint)
         if (prizeLocation > -1 && !prizeDrawn) {
             mDstRect.translate(
                 (MARGIN + mOffsetX + mSxy * mPrizeXBoardLocation).toFloat(),
@@ -349,12 +362,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 if (!mColorBall[x]!!.isDisabled) {
                     if (ballMoved == x && mBlinkDisplayOff) continue
                     mDstRect.translate(mColorBall[x]!!.getCoordX(), mColorBall[x]!!.getCoordY())
-
                     val offsetX = mDstRect.left
                     val offsetY = mDstRect.top
                     val offsetImage = Offset(offsetX, offsetY)
-
-
                     canvas.drawImage(mColorBall[x]!!.bitmap, offsetImage, mBmpPaint)
                 }
             }
@@ -362,11 +372,9 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             for (ball in mColorBall) {
                 if (!ball!!.isDisabled) {
                     mDstRect.translate(ball.getCoordX(), ball.getCoordY())
-
                     val offsetX = mDstRect.left
                     val offsetY = mDstRect.top
                     val offsetImage = Offset(offsetX, offsetY)
-
                     canvas.drawImage(ball.bitmap, offsetImage, mBmpPaint)
                 }
             }
@@ -684,20 +692,16 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         get() {
             var tokenToDraw: ImageBitmap? = mBmpCircleCenter
             if (boardSpaceValues[BoardSpaceValues.BOARDCENTER] == BoardSpaceValues.CROSS) tokenToDraw =
-                mBmpCrossCenter else if (boardSpaceValues[BoardSpaceValues.BOARDCENTER] == BoardSpaceValues.CIRCLECROSS) tokenToDraw =
-                mBmpCircleCrossCenter
+                mBmpCrossCenter!! else if (boardSpaceValues[BoardSpaceValues.BOARDCENTER] == BoardSpaceValues.CIRCLECROSS) tokenToDraw =
+                mBmpCircleCrossCenter!!
             return tokenToDraw
         }
 
     private fun drawPlayerToken(canvas: Canvas, location: Int) {
         if (boardSpaceValues[location] != BoardSpaceValues.EMPTY) {
-            canvas.drawImage(
-                mBmpTakenMove,
-                mTakenRect,
-                                mBmpPaint
-            ) //revert background to black
-            val tokenToDraw = getTokenToDraw(location)
             val offset = Offset(mDstRect.left, mDstRect.top)
+            canvas.drawImage(mBmpTakenMove, offset, mBmpPaint) //revert background to black
+            val tokenToDraw = getTokenToDraw(location)
             canvas.drawImage(tokenToDraw!!, offset, mBmpPaint)
         }
     }
@@ -773,7 +777,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                     (MARGIN + mOffsetX + mSxy * xValue).toFloat(),
                     (MARGIN + mOffsetY + mSxy * yValue).toFloat()
                 )
-                canvas.drawImage(mBmpTakenMove, mTakenRect, mDstRect)
+                val offset = Offset(mDstRect.left, mDstRect.top)
+                canvas.drawImage(mBmpTakenMove, offset, mBmpPaint)
             }
         }
     }
@@ -846,22 +851,16 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             }
         }
     }
-
     @Composable
     private fun DrawAvailableSquare(canvas: Canvas, xValue: Int, yValue: Int) {
         val offset = Offset((MARGIN + mOffsetX + mSxy * xValue).toFloat(),
-            (MARGIN + mOffsetY + mSxy * yValue).toFloat()
-        )
-
-        //mDstRect.offsetTo(MARGIN + mOffsetX + mSxy * xValue, MARGIN + mOffsetY + mSxy * yValue)
-        canvas.drawImage(mBmpAvailableMove, offset, mDstRect, null)
+            (MARGIN + mOffsetY + mSxy * yValue).toFloat())
+        canvas.drawImage(mBmpAvailableMove, offset, mBmpPaint)
     }
-
     //calculate the Y offset given the cell position on the game board
     private fun calculateYValue(cellNumber: Int): Int {
         return if (cellNumber < 5) 0 else if (cellNumber < 10) 1 else if (cellNumber < 15) 2 else if (cellNumber < 20) 3 else 4
     }
-
     @Composable
     fun InitializeBoard(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Keep the view squared
@@ -923,7 +922,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         resetUnusedTokens()
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
+    @Composable
+    fun onTouchEvent(event: MotionEvent): Boolean {
         if (mViewDisabled) return false
         if (moveModeTouch) return moveModeTouch(event)
         val action = event.action
@@ -996,20 +996,23 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 )
 
                 if (state == State.EMPTY) state = mCurrentPlayer
-                writeToLog("ClientService", "cell calculated: $cell")
+                    writeToLog("ClientService", "cell calculated: $cell")
                 if (ballMoved > -1) {
                     if (boardSpaceAvailableValues[cell]) {
-                        mDstRect.offsetTo(MARGIN + mOffsetX + mSxy * xPos, MARGIN + mOffsetY + mSxy * yPos)
-                        mColorBall[ballMoved]!!.setCoordX(MARGIN + mOffsetX + mSxy * xPos)
-                        mColorBall[ballMoved]!!.setCoordY(MARGIN + mOffsetY + mSxy * yPos)
-                        mBlinkRect[MARGIN + mOffsetX + xPos * mSxy, MARGIN + mOffsetY + yPos * mSxy, MARGIN + mOffsetX + (xPos + 1) * mSxy] =
+                        mDstRect.translate((MARGIN + mOffsetX + mSxy * xPos).toFloat(),
+                            (MARGIN + mOffsetY + mSxy * yPos).toFloat()
+                        )
+                        mColorBall[ballMoved]!!.setCoordX((MARGIN + mOffsetX + mSxy * xPos).toFloat())
+                        mColorBall[ballMoved]!!.setCoordY((MARGIN + mOffsetY + mSxy * yPos).toFloat())
+                        mBlinkRect[MARGIN + mOffsetX + xPos * mSxy, MARGIN + mOffsetY + yPos * mSxy,
+                            MARGIN + mOffsetX + (xPos + 1) * mSxy] =
                             MARGIN + mOffsetY + (yPos + 1) * mSxy
                         mSelectedCell = cell
                         mSelectedValue = state
                         writeToLog("ClientService", "ball id: $ballMoved cell calculated: $cell")
                     } else {
                         ballMoved = -1
-                        stopBlink()
+                        StopBlink()
                         writeToLog("ClientService","ball id: $ballMoved cell calculated: $cell space not available")
                     }
                 }
@@ -1028,7 +1031,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 }
             } else {
                 ballMoved = -1
-                mBlinkRect.setEmpty()
+                mBlinkRect = IntRect.Zero
                 mSelectedCell = -1
                 mCellListener!!.onCellSelected()
                 writeToLog("ClientService", "outside of board selected")
@@ -1120,11 +1123,14 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 writeToLog("ClientService", "cell calculated: $cell")
                 if (ballMoved > -1) {
                     if (boardSpaceAvailableValues[cell]) {
-                        mDstRect.offsetTo(MARGIN + mOffsetX + mSxy * xPos,MARGIN + mOffsetY + mSxy * yPos)
-                        mColorBall[ballMoved]!!.setCoordX(MARGIN + mOffsetX + mSxy * xPos)
-                        mColorBall[ballMoved]!!.setCoordY(MARGIN + mOffsetY + mSxy * yPos)
+                        mDstRect.translate((MARGIN + mOffsetX + mSxy * xPos).toFloat(),
+                            (MARGIN + mOffsetY + mSxy * yPos).toFloat()
+                        )
+                        mColorBall[ballMoved]!!.setCoordX((MARGIN + mOffsetX + mSxy * xPos).toFloat())
+                        mColorBall[ballMoved]!!.setCoordY((MARGIN + mOffsetY + mSxy * yPos).toFloat())
                         stopBlinkTouchMode()
-                        mBlinkRect[MARGIN + mOffsetX + xPos * mSxy, MARGIN + mOffsetY + yPos * mSxy, MARGIN + mOffsetX + (xPos + 1) * mSxy] =
+                        mBlinkRect[MARGIN + mOffsetX + xPos * mSxy, MARGIN + mOffsetY + yPos * mSxy,
+                            MARGIN + mOffsetX + (xPos + 1) * mSxy] =
                             MARGIN + mOffsetY + (yPos + 1) * mSxy
                         mSelectedCell = cell
                         mSelectedValue = state
@@ -1142,7 +1148,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
                 //if we've touched a valid square on the board then make it blink
                 if (boardSpaceAvailableValues[cell]) {
                     stopBlinkTouchMode()
-                    mBlinkRect[MARGIN + mOffsetX + xPos * mSxy, MARGIN + mOffsetY + yPos * mSxy, MARGIN + mOffsetX + (xPos + 1) * mSxy] =
+                    mBlinkRect[MARGIN + mOffsetX + xPos * mSxy, MARGIN + mOffsetY + yPos * mSxy,
+                        MARGIN + mOffsetX + (xPos + 1) * mSxy] =
                         MARGIN + mOffsetY + (yPos + 1) * mSxy
                     mHandler.sendEmptyMessageDelayed(MSG_BLINK_SQUARE, FPS_MS)
                     mSelectedCell = cell
@@ -1153,11 +1160,12 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
             if (ballMoved > -1 && mSelectedCell > -1) {
                 val xValue = mSelectedCell % 5
                 val yValue = calculateYValue(mSelectedCell)
-                mColorBall[ballMoved]!!.setCoordX(MARGIN + mOffsetX + mSxy * xValue)
-                mColorBall[ballMoved]!!.setCoordY(MARGIN + mOffsetY + mSxy * yValue)
+                mColorBall[ballMoved]!!.setCoordX((MARGIN + mOffsetX + mSxy * xValue).toFloat())
+                mColorBall[ballMoved]!!.setCoordY((MARGIN + mOffsetY + mSxy * yValue).toFloat())
                 mSelectedValue = mCurrentPlayer
                 stopBlinkTouchMode()
-                mBlinkRect[MARGIN + mOffsetX + xValue * mSxy, MARGIN + mOffsetY + yValue * mSxy, MARGIN + mOffsetX + (xValue + 1) * mSxy] =
+                mBlinkRect[MARGIN + mOffsetX + xValue * mSxy, MARGIN + mOffsetY + yValue * mSxy,
+                    MARGIN + mOffsetX + (xValue + 1) * mSxy] =
                     MARGIN + mOffsetY + (yValue + 1) * mSxy
                 mHandler.sendEmptyMessageDelayed(MSG_BLINK, FPS_MS)
                 if (!(mPrevSelectedBall == ballMoved && mPrevSelectedCell == mSelectedCell)) {
@@ -1259,15 +1267,16 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         return mColorBall[ballSelected]!!.type
     }
 
-    fun stopBlink() {
+    @Composable
+    fun StopBlink() {
         val hadSelection = mSelectedCell != -1 && mSelectedValue != State.EMPTY
         mSelectedCell = -1
         mSelectedValue = State.EMPTY
-        if (!mBlinkRect.isEmpty()) {
+        if (mBlinkRect != IntRect.Zero) {
             invalidate()
         }
         mBlinkDisplayOff = false
-        mBlinkRect.setEmpty()
+        mBlinkRect = IntRect.Zero
         mHandler.removeMessages(MSG_BLINK)
         mHandler.removeMessages(MSG_BLINK_TOKEN)
         mHandler.removeMessages(MSG_BLINK_SQUARE)
@@ -1278,7 +1287,7 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
 
     private fun stopBlinkTouchMode() {
         mBlinkDisplayOff = false
-        mBlinkRect.setEmpty()
+        mBlinkRect = IntRect.Zero
         mHandler.removeMessages(MSG_BLINK)
         mHandler.removeMessages(MSG_BLINK_TOKEN)
         mHandler.removeMessages(MSG_BLINK_SQUARE)
@@ -1349,27 +1358,32 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
 
     @Composable
     //think about putting this back in ColorBall class once I have refactored this class to be called from the UI
-    fun SetTokenColor(imageBitmap: ImageBitmap, newColor: Int) {
+    fun SetTokenColor(imageBitmap: ImageBitmap, newColor: Color) {
         val widthX = imageBitmap.width
         val heightY = imageBitmap.height
         val pixelArray = IntArray(widthX * heightY)
         val pixelMap: PixelMap? = imageBitmap.toPixelMap()
         for (x in pixelArray.indices) {
             if (pixelArray.get(x) != 0) {
-                pixelArray[x] = newColor
+                pixelArray[x] = newColor.value.toInt()
             }
         }
-        //return pixelMap
     }
-
     @Composable
-    private fun getResBitmapXYZ(bmpResId: ImageBitmap): ImageBitmap? {
-        val bitmap = createBitmapFromResource(bmpResId)
-        return bitmap
-    }
+    fun InitializeGame(viewModel: MyViewModel = viewModel { MyViewModel() }) {
+        // Observe the resource reference from ViewModel
+        val arrayResource by viewModel.currentArray.collectAsState()
+        val items: List<String> = stringArrayResource(arrayResource)
 
-    @Composable
-    fun InitializeGame() {
+        val gameDrawingState by viewModel.currentDrawingState.collectAsState()
+        val tokenColor1 = gameDrawingState.colorPlayer1
+        val tokenColor2 = gameDrawingState.colorPlayer2
+        mBlinkRect = gameDrawingState.blinkRect
+        mTokenColor1 = tokenColor1
+        mTokenColor2 = tokenColor2
+
+        //DrawingState.PLAYER1 = false
+
         mBmpPrize = createBitmapFromResource(Res.drawable.prize_token)
         mBmpCrossPlayer1 = createBitmapFromResource(Res.drawable.lib_crossred)
         SetTokenColor(mBmpCrossPlayer1!!, mTokenColor1)
@@ -1388,8 +1402,8 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         mBmpCircleCrossCenter = createBitmapFromResource(Res.drawable.lib_circlecrossgreen)
         mBmpAvailableMove = createBitmapFromResource(Res.drawable.allowed_move)
         mBmpTakenMove = createBitmapFromResource(Res.drawable.taken_move)
-        mSrcRect[0, 0, mBmpCrossPlayer1!!.width - 1] = mBmpCrossPlayer1!!.height - 1
-        mTakenRect[0, 0, mBmpAvailableMove.width - 1] = mBmpAvailableMove.height - 1
+        //mSrcRect[0, 0, mBmpCrossPlayer1!!.width - 1] = mBmpCrossPlayer1!!.height - 1
+        //mTakenRect[0, 0, mBmpAvailableMove.width - 1] = mBmpAvailableMove.height - 1
         mLinePaint.color = Color.Blue
         mLinePaint.strokeWidth = GRIDLINEWIDTH.toFloat()
         mLinePaint.style = PaintingStyle.Stroke
@@ -1446,8 +1460,6 @@ class GameView(canvas: DrawScope, canvasWidth: Int, canvasHeight: Int): MyViewMo
         private var INITIALIZATIONCOMPLETED = false
         private const val NUMBEROFTOKENS = 9
         private var mTokenSize = 0
-        private var mTokenColor1 = 0
-        private var mTokenColor2 = 0
         private var computerMove: Int = 0 //temporary value to assign token to computer move
         private var mPlayer1TokenChoice: Int = 0
         private var mPlayer2TokenChoice: Int = 0

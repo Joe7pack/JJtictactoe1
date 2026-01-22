@@ -2,6 +2,7 @@ package com.guzzardo.jjtictactoe1
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,9 +21,13 @@ sealed interface DrawingAction {
 }
 
 data class DrawingState(
-    val selectedColor: Color = Color.Black,
+    val colorPlayer1: Color = Color.Red,
+    val colorPlayer2: Color = Color.Blue,
     val currentPath: PathData? = null,
-    val paths: List<PathData> = emptyList()
+    val paths: List<PathData> = emptyList(),
+    val blinkRect: IntRect = IntRect.Zero,
+    val Player1: Boolean = false,
+    val Player2: Boolean = false
 )
 
 val allColors = listOf(
@@ -44,8 +49,9 @@ data class PathData(
 open class MyViewModel : ViewModel() {
     // Initial state points to a specific generated StringArrayResource
     private val _currentArray = MutableStateFlow<StringArrayResource>(Res.array.planets_array)
-    val currentArray = _currentArray.asStateFlow()
-
+    private val _currentDrawingState = MutableStateFlow(DrawingState())
+    val currentDrawingState = _currentDrawingState.asStateFlow()
+    val currentArray = _currentArray.asStateFlow() //read only StateFlow
     private val _state = MutableStateFlow(DrawingState())
     val state = _state.asStateFlow()
 
@@ -72,10 +78,12 @@ open class MyViewModel : ViewModel() {
         ) }
     }
 
-    private fun onSelectColor(color: Color) {
+    /* private */ fun onSelectColor(color: Color) {
         _state.update { it.copy(
             selectedColor = color
         ) }
+
+        InitializeGame(_currentDrawingState)
     }
 
     private fun onPathEnd() {
