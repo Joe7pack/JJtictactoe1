@@ -54,6 +54,8 @@ open class MyViewModel : ViewModel() {
     val currentArray = _currentArray.asStateFlow() //read only StateFlow
     private val _state = MutableStateFlow(DrawingState())
     val state = _state.asStateFlow()
+    val selectedColor = Color
+
 
     fun onAction(action: DrawingAction) {
         when(action) {
@@ -80,10 +82,12 @@ open class MyViewModel : ViewModel() {
 
     /* private */ fun onSelectColor(color: Color) {
         _state.update { it.copy(
-            selectedColor = color
+            colorPlayer1 = color
         ) }
 
-        InitializeGame(_currentDrawingState)
+        //InitializeGame(MyViewModel)
+        //StopBlink()
+        //MyScreen()
     }
 
     private fun onPathEnd() {
@@ -98,7 +102,7 @@ open class MyViewModel : ViewModel() {
         _state.update { it.copy(
             currentPath = PathData(
                 id = "JoeWasHere", //Clock.System.currentTimeMillis().toString(),
-                color = it.selectedColor,
+                color = it.colorPlayer1,
                 path = emptyList()
             )
         )

@@ -28,7 +28,12 @@ fun DrawingCanvas(
         modifier = modifier
             .clipToBounds()
             .background(Color.White)
-            .pointerInput(true) {
+            .pointerInput(true)
+
+
+
+
+            {
                 detectDragGestures(
                     onDragStart = {
                         onAction(DrawingAction.OnNewPathStart)

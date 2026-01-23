@@ -15,13 +15,14 @@ package com.guzzardo.jjtictactoe1
  * limitations under the License.
  */
 import androidx.compose.ui.geometry.Rect
+/*
+import java.util.*
 import com.guzzardo.jjtictactoe1.GameActivity.ClientThread
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.UserPreferences
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.isNetworkAvailable
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.prizesAreAvailable
 import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.playersTooClose
-import java.util.*
-import kotlin.math.sqrt
+ */
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.PixelMap
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,7 +67,7 @@ import kotlin.random.Random
 
 @Preview
 @Composable
-fun TestImage(viewModel: MyViewModel = viewModel { MyViewModel() }) {
+fun TestImage() {
     val circleCross = imageResource(Res.drawable.lib_circlecrossblue)
 
     Row {
@@ -81,11 +81,19 @@ fun TestImage(viewModel: MyViewModel = viewModel { MyViewModel() }) {
     }
 }
 
+//@Composable
+fun testNonComposable() {
+    drawCircle(color = Color.Blue, center = circleCenter, radius = circleRadius)
+    var someVar = false
+    if (true) {
+        someVar = true
+    }
+}
+
 //class GameView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
 class GameView(
-    canvas: DrawScope,
-    canvasWidth: Int,
-    canvasHeight: Int,
+    canvasWidth: Float,
+    canvasHeight: Float,
     tokenColor1: Color,
     tokenColor2: Color
 
@@ -104,21 +112,18 @@ class GameView(
             }
         }
     }
-
     private var mViewDisabled = false
     //private val mSrcRect = Rect
     private var mDstRect = Rect(0F,0F,0F,0F)
     //private var mTakenRect = Rect //: Offset = Offset(0F,0F)
     private var mOffsetX = 0
     private var mOffsetY = 0
-/*  } need to remove this end brace before uncommenting rest of this class!!! */
-
-private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to make token blink
+    //TODO - I think we can replace Handler with logic in BlinkingRectangle
+    //private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to make token blink
 
 // Paint class is a fundamental component of Android's 2D drawing framework. It holds the style and color information about
 // how to draw shapes, text, and bitmaps to a Canvas.
 // The Paint() constructor creates a new Paint object with default settings.
-
     private val mWinPaint = Paint()
     private val mLinePaint = Paint()
     private var mBmpPaint = Paint()
@@ -446,18 +451,21 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
     }
 
     fun setGamePrize(prize: Boolean) {
+        //TODO - uncomment this later
+        /*
         if (prize) {
-            if (isNetworkAvailable && prizesAreAvailable && !playersTooClose) {
-                prizeLocation = mRandom.nextInt(BoardSpaceValues.BOARDSIZE)
-                //mPrizeLocation = 11; //set prize to a fixed location
-                mPrizeXBoardLocation = mPrizeXBoardLocationArray[prizeLocation]
-                mPrizeYBoardLocation = mPrizeYBoardLocationArray[prizeLocation]
-            }
-        } else {
-            prizeLocation = -1
+        if (isNetworkAvailable && prizesAreAvailable && !playersTooClose) {
+            prizeLocation = mRandom.nextInt(BoardSpaceValues.BOARDSIZE)
+            //mPrizeLocation = 11; //set prize to a fixed location
+            mPrizeXBoardLocation = mPrizeXBoardLocationArray[prizeLocation]
+            mPrizeYBoardLocation = mPrizeYBoardLocationArray[prizeLocation]
         }
+    } else {
+        prizeLocation = -1
     }
 
+    */
+    }
     @Composable
     fun InitializeGameValues() {
         for (x in data.indices) {
@@ -538,8 +546,9 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
         // Point
         var bitmap = createBitmapFromResource(Res.drawable.lib_circlered)
         for (x in 0..3) {
-            tokenPointLandscape[landscapeLocationXPlayer1] = landscapeLocationYPlayer1
-            tokenPointPortrait[portraitLocationXPlayer1] = portraitLocationYPlayer1
+            //TODO - fix this later
+            //tokenPointLandscape[landscapeLocationXPlayer1] = landscapeLocationYPlayer1
+            //tokenPointPortrait[portraitLocationXPlayer1] = portraitLocationYPlayer1
             landscapeLocationXPlayer1 += landscapeIncrementXPlayer1
             portraitLocationXPlayer1 += portraitIncrementXPlayer1
             landscapeLocationYPlayer1 += landscapeIncrementYPlayer
@@ -559,8 +568,8 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
             )
         }
         for (x in 4 until NUMBEROFTOKENS - 1) {
-            tokenPointLandscape[landscapeLocationXPlayer2] = landscapeLocationYPlayer2
-            tokenPointPortrait[portraitLocationXPlayer2] = portraitLocationYPlayer2
+            //tokenPointLandscape[landscapeLocationXPlayer2] = landscapeLocationYPlayer2
+            //tokenPointPortrait[portraitLocationXPlayer2] = portraitLocationYPlayer2
             landscapeLocationXPlayer2 += landscapeIncrementXPlayer2
             portraitLocationXPlayer2 += portraitIncrementXPlayer2
             landscapeLocationYPlayer2 += landscapeIncrementYPlayer
@@ -578,11 +587,13 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                 mTokenColor2
             )
         }
+        /*
         if (isClientRunning) {
             sendTokensToServer()
         }
         writeToLog("GameView", "Game started: ${GameActivity.isGameStarted} Opposing player ID:  ${GameActivity.mPlayer2Id}, " +
                 "Opposing player Name:  ${GameActivity.mPlayer2Name}")
+         */
     }
 
     @Composable
@@ -647,7 +658,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
 
     fun setCell(cellIndex: Int, value: State?) {
         data[cellIndex] = value
-        invalidate()
     }
 
     fun setCellListener(cellListener: ICellListener?) {
@@ -922,6 +932,7 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
         resetUnusedTokens()
     }
 
+    /*
     @Composable
     fun onTouchEvent(event: MotionEvent): Boolean {
         if (mViewDisabled) return false
@@ -968,7 +979,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                     break
                 }
             }
-            invalidate()
             return true
         } else if (action == MotionEvent.ACTION_MOVE) {
             X = event.x.toInt()
@@ -979,7 +989,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                 if (Y > 25 && Y < BoardLowerLimit) mColorBall[ballMoved]!!
                     .setCoordY(Y-25F)
             }
-            invalidate()
             return true
         } else if (action == MotionEvent.ACTION_UP) {
             X = event.x.toInt()
@@ -1047,7 +1056,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                 //writeToLog("ClientService", "ball reset: $x")
                 ball.resetPosition(mDisplayMode)
             }
-            invalidate()
             return true
         }
         return false
@@ -1140,7 +1148,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                             mCellListener!!.onCellSelected()
                             mPrevSelectedBall = ballMoved
                             mPrevSelectedCell = mSelectedCell
-                            invalidate()
                         }
                         return true
                     }
@@ -1153,7 +1160,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                         MARGIN + mOffsetY + (yPos + 1) * mSxy
                     mHandler.sendEmptyMessageDelayed(MSG_BLINK_SQUARE, FPS_MS)
                     mSelectedCell = cell
-                    invalidate()
                     return true
                 }
             }
@@ -1172,7 +1178,6 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                     mCellListener!!.onCellSelected()
                     mPrevSelectedBall = ballMoved
                     mPrevSelectedCell = mSelectedCell
-                    invalidate()
                 }
                 return true
             }
@@ -1182,11 +1187,11 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
                 mBlinkRect[rect.left, rect.top, rect.left + TOKENSIZE] =
                     rect.top + TOKENSIZE
                 mHandler.sendEmptyMessageDelayed(MSG_BLINK_TOKEN, FPS_MS)
-                invalidate()
             }
         }
         return false
     }
+    */
 
     fun selectSpecificComputerToken(type: Int, offense: Boolean): Int {
         for (x in 0..3) {
@@ -1273,13 +1278,13 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
         mSelectedCell = -1
         mSelectedValue = State.EMPTY
         if (mBlinkRect != IntRect.Zero) {
-            invalidate()
+            //invalidate()
         }
         mBlinkDisplayOff = false
         mBlinkRect = IntRect.Zero
-        mHandler.removeMessages(MSG_BLINK)
-        mHandler.removeMessages(MSG_BLINK_TOKEN)
-        mHandler.removeMessages(MSG_BLINK_SQUARE)
+        //mHandler.removeMessages(MSG_BLINK)
+        //mHandler.removeMessages(MSG_BLINK_TOKEN)
+        //mHandler.removeMessages(MSG_BLINK_SQUARE)
         if (hadSelection && mCellListener != null) {
             mCellListener!!.onCellSelected() //enables I'm done button
         }
@@ -1288,11 +1293,12 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
     private fun stopBlinkTouchMode() {
         mBlinkDisplayOff = false
         mBlinkRect = IntRect.Zero
-        mHandler.removeMessages(MSG_BLINK)
-        mHandler.removeMessages(MSG_BLINK_TOKEN)
-        mHandler.removeMessages(MSG_BLINK_SQUARE)
+        //mHandler.removeMessages(MSG_BLINK)
+        //mHandler.removeMessages(MSG_BLINK_TOKEN)
+        //mHandler.removeMessages(MSG_BLINK_SQUARE)
     }
 
+    /*
     private inner class MyHandler : Handler.Callback {
         override fun handleMessage(msg: Message): Boolean {
             if (msg.what == MSG_BLINK) {
@@ -1324,6 +1330,7 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
             return false
         }
     }
+    */
 
     fun disableBall() {
         if (ballMoved > -1) {
@@ -1336,23 +1343,26 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
         mColorBall[ballId]!!.isDisabled = true
     }
 
-    fun setClient(clientThread: ClientThread?) {
-        mClientThread = clientThread
-    }
+    /*
+fun setClient(clientThread: ClientThread?) {
+    mClientThread = clientThread
+}
 
-    private val isClientRunning: Boolean
-        get() = GameActivity.isClientRunning
 
-    fun setGameActivity(gameActivity: GameActivity?) {
-        mGameActivity = gameActivity
-    }
+private val isClientRunning: Boolean
+    get() = GameActivity.isClientRunning
+
+fun setGameActivity(gameActivity: GameActivity?) {
+    mGameActivity = gameActivity
+}
+ */
 
     private val sharedPreferences: Unit
         get() {
-            val settings = mContext.getSharedPreferences(UserPreferences.PREFS_NAME, Context.MODE_PRIVATE)
-            mTokenSize = settings.getInt(GameActivity.TOKEN_SIZE, 50)
-            mTokenColor1 = settings.getInt(GameActivity.TOKEN_COLOR_1, Color.RED)
-            mTokenColor2 = settings.getInt(GameActivity.TOKEN_COLOR_2, Color.BLUE)
+            //val settings = mContext.getSharedPreferences(UserPreferences.PREFS_NAME, Context.MODE_PRIVATE)
+            mTokenSize = 50 //settings.getInt(GameActivity.TOKEN_SIZE, 50)
+            mTokenColor1 = Color.Red //settings.getInt(GameActivity.TOKEN_COLOR_1, Color.RED)
+            mTokenColor2 = Color.Blue //settings.getInt(GameActivity.TOKEN_COLOR_2, Color.BLUE)
         }
 
 
@@ -1498,16 +1508,18 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
         private var mPrizeXBoardLocation = 0
         private var mPrizeYBoardLocation = 0
         private var HUMAN_VS_HUMAN = false
-        private var mClientThread: ClientThread? = null
-        private var mGameActivity: GameActivity? = null
+        //private var mClientThread: ClientThread? = null
+        //private var mGameActivity: GameActivity? = null
         private var mPrevSelectedBall = 0 //save value for touch selection
         private var mPrevSelectedCell = 0 //save value for touch selection
 
-        private lateinit var resources: Resources
+        //private lateinit var resources: Resources
         private fun writeToLog(filter: String, msg: String) {
+            /*
             if ("true".equals(resources.getString(R.string.debug), ignoreCase = true)) {
                 Log.d(filter, msg)
             }
+             */
         }
         var mBmpCrossPlayer1: ImageBitmap? = null
         var mBmpCrossPlayer2: ImageBitmap? = null
@@ -1524,8 +1536,8 @@ private val mHandler = Handler(Looper.getMainLooper(), MyHandler()) //this is to
     }
 
     init {
-        isFocusable = true //necessary for getting the touch events
-        requestFocus()
+        //isFocusable = true //necessary for getting the touch events
+        //requestFocus()
         sharedPreferences
 
         computerMove = 4 //temporary value for determining next token for computer to move

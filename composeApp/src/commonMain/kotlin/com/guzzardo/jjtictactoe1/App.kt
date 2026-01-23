@@ -57,6 +57,7 @@ fun App() {
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
+
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(painterResource(Res.drawable.compose_multiplatform), null)
@@ -66,12 +67,12 @@ fun App() {
                     val resourceName = stringResource(Res.string.favorites)
                     Text(text = resourceName)
                     //TestFun("joe")
-                    SampleNavigationSuiteScaffoldParts()
+                    //SampleNavigationSuiteScaffoldParts()
                     //KmpLineDrawingScreen()
-                    DrawingCanvas2()
+                    //DrawingCanvas2()
+                    //InteractiveCanvasWithItems()
                     TestImage()
-                    //InitializeGame()
-                    //setTokenColor(mBmpCrossPlayer1, 0)
+                    InteractiveCanvasWithItems()
                 }
             }
         }
