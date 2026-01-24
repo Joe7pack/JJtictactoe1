@@ -9,24 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.window.core.layout.WindowSizeClass
-import com.guzzardo.jjtictactoe1.GameView.Companion.mBmpCrossPlayer1
-import com.guzzardo.jjtictactoe1.ColorBall.Companion
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.compose_multiplatform
 import jjtictactoe1.composeapp.generated.resources.favorites
-import jjtictactoe1.composeapp.generated.resources.planets_array
-import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -34,6 +27,9 @@ import org.jetbrains.compose.resources.stringResource
 fun App() {
     //We're only allowed 1 app!
     MaterialTheme {
+
+        //val gamePlay = remember { GameView(20F, 20F, Color.Red, Color.Blue)}
+
         var showContent by remember { mutableStateOf(false) }
         //Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         //val viewModel = viewModel<MyViewModel>()
@@ -65,14 +61,15 @@ fun App() {
                     //Text("Window width: $minWidthDp")
                     //Text("Window height: $minHeightDp")
                     val resourceName = stringResource(Res.string.favorites)
-                    Text(text = resourceName)
+                    //Text(text = resourceName)
                     //TestFun("joe")
                     //SampleNavigationSuiteScaffoldParts()
                     //KmpLineDrawingScreen()
                     //DrawingCanvas2()
                     //InteractiveCanvasWithItems()
-                    TestImage()
-                    InteractiveCanvasWithItems()
+                    //TestImage()
+                    InteractiveCanvasWithItems(viewModel)
+
                 }
             }
         }

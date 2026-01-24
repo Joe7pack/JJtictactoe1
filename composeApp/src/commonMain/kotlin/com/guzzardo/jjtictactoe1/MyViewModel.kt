@@ -1,7 +1,12 @@
 package com.guzzardo.jjtictactoe1
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +15,9 @@ import org.jetbrains.compose.resources.StringArrayResource
 import kotlinx.coroutines.flow.update
 import jjtictactoe1.composeapp.generated.resources.Res // Generated resource class
 import jjtictactoe1.composeapp.generated.resources.planets_array
+import jjtictactoe1.composeapp.generated.resources.prize_token
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.imageResource
 import kotlin.time.Clock
 
 sealed interface DrawingAction {
@@ -19,7 +27,6 @@ sealed interface DrawingAction {
     data class OnSelectColor(val color: Color): DrawingAction
     //data object OnClearCanvasClick: DrawingAction
 }
-
 data class DrawingState(
     val colorPlayer1: Color = Color.Red,
     val colorPlayer2: Color = Color.Blue,
@@ -27,7 +34,9 @@ data class DrawingState(
     val paths: List<PathData> = emptyList(),
     val blinkRect: IntRect = IntRect.Zero,
     val Player1: Boolean = false,
-    val Player2: Boolean = false
+    val Player2: Boolean = false,
+    val prizeImageBitmap: DrawableResource = Res.drawable.prize_token,
+    val prizeLocation: Int = -1,
 )
 
 val allColors = listOf(
@@ -54,8 +63,23 @@ open class MyViewModel : ViewModel() {
     val currentArray = _currentArray.asStateFlow() //read only StateFlow
     private val _state = MutableStateFlow(DrawingState())
     val state = _state.asStateFlow()
-    val selectedColor = Color
+    val selectedColor = _state.value.colorPlayer1 //Color
+    private val _circleColor = MutableStateFlow(Color.Blue)
+    //val _circleColor = _circleColor.asStateFlow()
+    //val circleColor: State<Color> = _circleColor
+    val circleColor = _circleColor.asStateFlow()
 
+
+    var circlePosition by mutableStateOf(Offset(200f, 200f))
+
+    fun changeColor() {
+        _circleColor.value = Color.Red
+    }
+
+    // Update position based on touch input
+    fun updatePosition(newOffset: Offset) {
+        circlePosition = newOffset
+    }
 
     fun onAction(action: DrawingAction) {
         when(action) {

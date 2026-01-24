@@ -14,10 +14,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 // ... other imports
 
 @Composable
-fun InteractiveCanvasWithItems() {
+fun InteractiveCanvasWithItems(viewModel: MyViewModel = viewModel() ) {
     val circleCenter = Offset(200f, 200f)
     val circleRadius = 100f
-
+    val myColor = viewModel.selectedColor
     Canvas(modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
@@ -26,7 +26,7 @@ fun InteractiveCanvasWithItems() {
                     // Perform hit testing
                     val distance = (offset - circleCenter).getDistance()
                     if (distance <= circleRadius) {
-                        println("Blue circle clicked!")
+                        println("${myColor.toString()} circle clicked!")
                         // Call a specific handler function for the circle
                     }
                 }
@@ -36,15 +36,17 @@ fun InteractiveCanvasWithItems() {
         val canvasWidth = size.width
         val canvasHeight = size.height
 
-
-        drawCircle(color = Color.Blue, center = circleCenter, radius = circleRadius)
+        drawCircle(color = myColor, center = circleCenter, radius = circleRadius)
+        //drawCircle(color = Color.Green, center = circleCenter, radius = circleRadius)
         // Draw other items and perform hit testing for them too
         val gameview = GameView(size.width, size.height, Color.Red, Color.Blue)
-        gameview.InitializeGame()  //move GameView to shared folder? And put GameView in a remember bracket?
-        TestImage()
-        InteractiveCanvasWithItems()
-        testNonComposable()
-
+        //gameview.InitializeGame2(this, viewModel)  //move GameView to shared folder? And put GameView in a remember bracket?
+        //TestImage()
+        //InteractiveCanvasWithItems()
+        //testNonComposable()
+        //MultiplatformView()
     }
 }
+
+
 

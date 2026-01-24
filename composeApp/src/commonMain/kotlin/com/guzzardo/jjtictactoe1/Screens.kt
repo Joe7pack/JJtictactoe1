@@ -1,5 +1,6 @@
 package com.guzzardo.jjtictactoe1
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,10 @@ import androidx.compose.runtime.getValue
 import org.jetbrains.compose.resources.stringArrayResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -34,7 +38,7 @@ fun MyScreen(viewModel: MyViewModel = viewModel { MyViewModel() }) {
             Button(
                 onClick = {
                     // Handle button click for this specific item
-                    println("Button clicked for item: $item")
+                    println("Button clicked for Joes item: $item")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -42,5 +46,19 @@ fun MyScreen(viewModel: MyViewModel = viewModel { MyViewModel() }) {
             ) { Text(item)
             }
         }
+    }
+}
+
+@Composable
+fun MultiplatformView2() {
+    val drawer = remember { ShapeDrawer(Color.Blue) }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        // 'this' refers to DrawScope here
+        drawer.drawHighlight(this)
+
+        // You can also call members directly if the class is an extension
+        // or just use its properties to drive standard draw commands
+        drawRect(color = drawer.color, size = size / 2f)
     }
 }
