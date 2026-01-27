@@ -21,12 +21,17 @@ import org.jetbrains.compose.resources.imageResource
 import kotlin.time.Clock
 
 sealed interface DrawingAction {
-    data object OnNewPathStart: DrawingAction
-    data class OnDraw(val offset: Offset): DrawingAction
+    data object OnNewPathStart: DrawingAction  //an object is a singleton or a static member
+    data class OnDraw(val offset: Offset): DrawingAction //a class is designed to hold data
     data object OnPathEnd: DrawingAction
     data class OnSelectColor(val color: Color): DrawingAction
-    //data object OnClearCanvasClick: DrawingAction
+    data object OnClearCanvasClick: DrawingAction
+    }
+
+sealed interface GameAction {
+    data class OnStartGame(val canvasSize: Int): GameAction
 }
+
 data class DrawingState(
     val colorPlayer1: Color = Color.Red,
     val colorPlayer2: Color = Color.Blue,
@@ -37,6 +42,7 @@ data class DrawingState(
     val Player2: Boolean = false,
     val prizeImageBitmap: DrawableResource = Res.drawable.prize_token,
     val prizeLocation: Int = -1,
+    var canvasSize: Int = 0
 )
 
 val allColors = listOf(
@@ -68,33 +74,34 @@ open class MyViewModel : ViewModel() {
     //val _circleColor = _circleColor.asStateFlow()
     //val circleColor: State<Color> = _circleColor
     val circleColor = _circleColor.asStateFlow()
-
-
     var circlePosition by mutableStateOf(Offset(200f, 200f))
-
-    fun changeColor() {
-        _circleColor.value = Color.Red
-    }
+        private set
 
     // Update position based on touch input
     fun updatePosition(newOffset: Offset) {
         circlePosition = newOffset
     }
 
+    fun changeColor() {
+        _circleColor.value = Color.Red
+    }
+
     fun onAction(action: DrawingAction) {
         when(action) {
-            //DrawingAction.OnClearCanvasClick -> onClearCanvasClick()
+            DrawingAction.OnClearCanvasClick -> onClearCanvasClick()
             is DrawingAction.OnDraw -> onDraw(action.offset)
             DrawingAction.OnNewPathStart -> onNewPathStart()
             DrawingAction.OnPathEnd -> onPathEnd()
             is DrawingAction.OnSelectColor -> onSelectColor(action.color)
+
+        }
+    }
+    fun onAction(action: GameAction) {
+        when(action) {
+            is GameAction.OnStartGame -> onStartGame(action.canvasSize)
         }
     }
 
-    /* fun updateArray(useSecondArray: Boolean) {
-        _currentArray.value =
-            if (useSecondArray) Res.array.my_array_two else Res.array.planets_array
-    } */
     private fun onDraw(offset: Offset) {
         val currentPathData = state.value.currentPath ?: return
         _state.update { it.copy(
@@ -108,10 +115,6 @@ open class MyViewModel : ViewModel() {
         _state.update { it.copy(
             colorPlayer1 = color
         ) }
-
-        //InitializeGame(MyViewModel)
-        //StopBlink()
-        //MyScreen()
     }
 
     private fun onPathEnd() {
@@ -132,6 +135,21 @@ open class MyViewModel : ViewModel() {
         )
         }
     }
+
+    private fun onClearCanvasClick() {
+        _state.update { it.copy(
+            currentPath = null,
+            paths = emptyList()
+        ) }
+    }
+
+    private fun onStartGame(canvasSizex: Int) {
+        _state.update { it.copy(
+            canvasSize = canvasSizex
+        )
+        }
+    }
+
 }
 
 // ViewModelFactory that retrieves the data repository for your app.

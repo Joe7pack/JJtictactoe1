@@ -4,15 +4,21 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // ... other imports
 
+@Preview
 @Composable
 fun InteractiveCanvasWithItems(viewModel: MyViewModel = viewModel() ) {
     val circleCenter = Offset(200f, 200f)
@@ -35,18 +41,21 @@ fun InteractiveCanvasWithItems(viewModel: MyViewModel = viewModel() ) {
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height
-
         drawCircle(color = myColor, center = circleCenter, radius = circleRadius)
         //drawCircle(color = Color.Green, center = circleCenter, radius = circleRadius)
         // Draw other items and perform hit testing for them too
-        val gameview = GameView(size.width, size.height, Color.Red, Color.Blue)
-        //gameview.InitializeGame2(this, viewModel)  //move GameView to shared folder? And put GameView in a remember bracket?
-        //TestImage()
-        //InteractiveCanvasWithItems()
+        //val gameView = GameView(size.width, size.height, Color.Red, Color.Blue)
+        //val myObject = remember { GameView(size.width, size.height, Color.Red, Color.Blue) } // Using remember to persist the instance across recompositions
+        //InitializeGame2(this, viewModel)  //move GameView to shared folder? And put GameView in a remember bracket?
+        //TestImage2(this)
         //testNonComposable()
         //MultiplatformView()
+        //InitializeGame2(this)
     }
 }
+
+
+
 
 
 

@@ -25,8 +25,11 @@ import com.guzzardo.jjtictactoe1.WillyShmoApplication.Companion.playersTooClose
  */
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.SnapPosition.Center.position
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,6 +44,7 @@ import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.IntRect
+import androidx.lifecycle.viewmodel.compose.viewModel
 //import com.guzzardo.jjtictactoe1.SetTokenColor
 //import jjtictactoe1.GameView.Companion.TOKENSIZE
 //import com.guzzardo.jjtictactoe1.GameView.Companion.mSxy
@@ -81,6 +85,38 @@ fun TestImage() {
     }
 }
 
+@Preview
+@Composable
+fun TestImage2(rowScope: RowScope, viewModel: MyViewModel = viewModel()) {
+    val circleCross = imageResource(Res.drawable.lib_circlecrossblue)
+    val gameDrawingState by viewModel.currentDrawingState.collectAsState()
+    val tokenColor1 = gameDrawingState.colorPlayer1
+        Image(
+            painter = painterResource(Res.drawable.lib_circlecrossblue),
+            contentDescription = "some text here"
+        )
+        Row {
+            Text("Hey there!")
+        }
+    }
+
+@Composable
+fun InitializeGame2() { //drawScope: DrawScope,viewModel: MyViewModel = viewModel()) {
+    //mBmpPrize = createBitmapFromResource(Res.drawable.prize_token)
+    //drawScope.drawImage(mBmpPrize)
+
+    // Observe the resource reference from ViewModel
+    //val arrayResource by viewModel.currentArray.collectAsState()
+    //val items: List<String> = stringArrayResource(arrayResource)
+
+    //val gameDrawingState by viewModel.currentDrawingState.collectAsState()
+    //val tokenColor1 = gameDrawingState.colorPlayer1
+    //val tokenColor2 = gameDrawingState.colorPlayer2
+    //mBlinkRect = gameDrawingState.blinkRect
+    //mTokenColor1 = gameDrawingState.colorPlayer1
+    //mTokenColor2 = gameDrawingState.colorPlayer2
+}
+
 @Composable
 fun testNonComposable() {
     //drawCircle(color = Color.Blue, center = circleCenter, radius = circleRadius)
@@ -89,9 +125,6 @@ fun testNonComposable() {
         someVar = true
     }
 }
-
-
-
 
 //class GameView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
 class GameView(
@@ -1385,24 +1418,24 @@ fun setGameActivity(gameActivity: GameActivity?) {
     }
 
     @Composable
-    fun InitializeGame2(drawScope: DrawScope, viewModel: MyViewModel) {
-        mBmpPrize = createBitmapFromResource(Res.drawable.prize_token)
-        drawScope.drawImage(mBmpPrize)
+    fun InitializeGame3(drawScope: DrawScope,viewModel: MyViewModel = viewModel()) {
+        //mBmpPrize = createBitmapFromResource(Res.drawable.prize_token)
+        //drawScope.drawImage(mBmpPrize)
 
         // Observe the resource reference from ViewModel
-        val arrayResource by viewModel.currentArray.collectAsState()
-        val items: List<String> = stringArrayResource(arrayResource)
+        //val arrayResource by viewModel.currentArray.collectAsState()
+        //val items: List<String> = stringArrayResource(arrayResource)
 
         val gameDrawingState by viewModel.currentDrawingState.collectAsState()
-        val tokenColor1 = gameDrawingState.colorPlayer1
-        val tokenColor2 = gameDrawingState.colorPlayer2
-        mBlinkRect = gameDrawingState.blinkRect
-        mTokenColor1 = gameDrawingState.colorPlayer1
-        mTokenColor2 = gameDrawingState.colorPlayer2
+        //val tokenColor1 = gameDrawingState.colorPlayer1
+        //val tokenColor2 = gameDrawingState.colorPlayer2
+        //mBlinkRect = gameDrawingState.blinkRect
+        //mTokenColor1 = gameDrawingState.colorPlayer1
+        //mTokenColor2 = gameDrawingState.colorPlayer2
     }
 
     @Composable
-    fun InitializeGame(drawScope: DrawScope, viewModel: MyViewModel) {
+    fun DrawScope.InitializeGame(viewModel: MyViewModel  = viewModel()) {
         // Observe the resource reference from ViewModel
         val arrayResource by viewModel.currentArray.collectAsState()
         val items: List<String> = stringArrayResource(arrayResource)

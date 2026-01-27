@@ -13,23 +13,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.compose_multiplatform
 import jjtictactoe1.composeapp.generated.resources.favorites
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
     //We're only allowed 1 app!
     MaterialTheme {
-
         //val gamePlay = remember { GameView(20F, 20F, Color.Red, Color.Blue)}
-
         var showContent by remember { mutableStateOf(false) }
         //Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         //val viewModel = viewModel<MyViewModel>()
@@ -50,13 +47,11 @@ fun App() {
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
-
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    //Image(painterResource(Res.drawable.compose_multiplatform), null)
                     Text("Compose: $greeting")
                     //Text("Window width: $minWidthDp")
                     //Text("Window height: $minHeightDp")
@@ -65,11 +60,34 @@ fun App() {
                     //TestFun("joe")
                     //SampleNavigationSuiteScaffoldParts()
                     //KmpLineDrawingScreen()
-                    //DrawingCanvas2()
+                    GameCanvas(
+                        onAction = viewModel::onAction,
+                        modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f))
+                    /*
+                    DrawingCanvas(
+                        state.paths,
+                         currentPath = state.currentPath,
+                         onAction = viewModel::onAction,
+                         modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f))
+                    */
+                    CanvasControls(
+                        selectedColor = viewModel.selectedColor,
+                        colors = allColors,
+                        onSelectColor = {
+                            viewModel.onAction(DrawingAction.OnSelectColor(it))
+                        },
+                        onClearCanvas = {
+                            viewModel.onAction(DrawingAction.OnClearCanvasClick)
+                        }
+                    )
                     //InteractiveCanvasWithItems()
                     //TestImage()
-                    InteractiveCanvasWithItems(viewModel)
-
+                    //InteractiveCanvasWithItems(viewModel)
+                    //MoveableCircleScreen()
                 }
             }
         }
