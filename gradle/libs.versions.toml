@@ -47,7 +47,7 @@ adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", versi
 adaptive-layout = { module = "org.jetbrains.compose.material3:material3-adaptive-layout", version.ref = "compose-material3-adaptive-navigation-suite" }
 adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "compose-material3-adaptive-navigation-suite" }
 androidx-activity-compose-v1110 = { module = "androidx.activity:activity-compose", version.ref = "activityCompose-v1110" }
-androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+#androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }

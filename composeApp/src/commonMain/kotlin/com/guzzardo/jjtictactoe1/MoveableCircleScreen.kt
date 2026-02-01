@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun MoveableCircleScreen(viewModel: MyViewModel = viewModel()) {
-    val position = viewModel.circlePosition
+    //val position = viewModel.circlePosition
 
     Canvas(
         modifier = Modifier
@@ -20,7 +20,7 @@ fun MoveableCircleScreen(viewModel: MyViewModel = viewModel()) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
                     // Update the state in the ViewModel
-                    viewModel.updatePosition(position + dragAmount)
+                    //viewModel.updatePosition(position + dragAmount)
                 }
             }
     ) {
@@ -29,7 +29,7 @@ fun MoveableCircleScreen(viewModel: MyViewModel = viewModel()) {
         drawCircle(
             color = Color.Blue,
             radius = 100f,
-            center = position
+            //center = position
         )
     }
 }

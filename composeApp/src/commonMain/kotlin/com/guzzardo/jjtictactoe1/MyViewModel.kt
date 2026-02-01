@@ -1,6 +1,5 @@
 package com.guzzardo.jjtictactoe1
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,7 +28,8 @@ sealed interface DrawingAction {
     }
 
 sealed interface GameAction {
-    data class OnStartGame(val canvasSize: Int): GameAction
+    data class OnStartGame(val canvasSize: Offset): GameAction
+    data class OnNewGame(val gameSize: Offset): GameAction
 }
 
 data class DrawingState(
@@ -42,7 +42,9 @@ data class DrawingState(
     val Player2: Boolean = false,
     val prizeImageBitmap: DrawableResource = Res.drawable.prize_token,
     val prizeLocation: Int = -1,
-    var canvasSize: Int = 0
+    var canvasSize: Offset = Offset(0F, 0F),
+    var gameSize: Offset = Offset(0F, 0F),
+    var rotationDegrees: Float = 0F
 )
 
 val allColors = listOf(
@@ -64,22 +66,43 @@ data class PathData(
 open class MyViewModel : ViewModel() {
     // Initial state points to a specific generated StringArrayResource
     private val _currentArray = MutableStateFlow<StringArrayResource>(Res.array.planets_array)
+    val currentArray = _currentArray.asStateFlow() //read only StateFlow
     private val _currentDrawingState = MutableStateFlow(DrawingState())
     val currentDrawingState = _currentDrawingState.asStateFlow()
-    val currentArray = _currentArray.asStateFlow() //read only StateFlow
     private val _state = MutableStateFlow(DrawingState())
     val state = _state.asStateFlow()
-    val selectedColor = _state.value.colorPlayer1 //Color
+    private val _gameSize = MutableStateFlow(Offset(200f, 200f))
+    val gameSize = _gameSize.asStateFlow()
     private val _circleColor = MutableStateFlow(Color.Blue)
-    //val _circleColor = _circleColor.asStateFlow()
-    //val circleColor: State<Color> = _circleColor
     val circleColor = _circleColor.asStateFlow()
-    var circlePosition by mutableStateOf(Offset(200f, 200f))
-        private set
+    private val _pivotPoint = MutableStateFlow(Offset(200f, 200f))
+    val pivotPoint = _pivotPoint.asStateFlow()
+    private val _rotationDegrees = MutableStateFlow(0F)
+    val rotationDegrees = _rotationDegrees.asStateFlow()
 
-    // Update position based on touch input
-    fun updatePosition(newOffset: Offset) {
-        circlePosition = newOffset
+    val selectedColor = _state.value.colorPlayer1 //Color
+
+    //val circleColor: State<Color> = _circleColor
+    //val circleColor = _circleColor.asStateFlow()
+        //private set
+
+        //private set
+
+    // Update position based on Canvas size
+    fun updateGameSize(newOffset: Offset) {
+        _gameSize.value = newOffset
+    }
+
+    fun updatePivotPoint(newOffset: Offset) {
+        _pivotPoint.value = newOffset
+    }
+
+    fun updateRotationDegrees(newRotation: Float) {
+        _rotationDegrees.value = newRotation
+    }
+
+    fun getRotationDegrees(): Float {
+        return _rotationDegrees.value
     }
 
     fun changeColor() {
@@ -99,6 +122,7 @@ open class MyViewModel : ViewModel() {
     fun onAction(action: GameAction) {
         when(action) {
             is GameAction.OnStartGame -> onStartGame(action.canvasSize)
+            is GameAction.OnNewGame -> onNewGame(gameSize = action.gameSize)
         }
     }
 
@@ -143,13 +167,19 @@ open class MyViewModel : ViewModel() {
         ) }
     }
 
-    private fun onStartGame(canvasSizex: Int) {
+    private fun onStartGame(canvasSize: Offset) {
         _state.update { it.copy(
-            canvasSize = canvasSizex
+            canvasSize = canvasSize
         )
         }
     }
 
+    /* private */ fun onNewGame(gameSize: Offset) {
+        _state.update { it.copy(
+            gameSize = gameSize
+        )
+        }
+    }
 }
 
 // ViewModelFactory that retrieves the data repository for your app.

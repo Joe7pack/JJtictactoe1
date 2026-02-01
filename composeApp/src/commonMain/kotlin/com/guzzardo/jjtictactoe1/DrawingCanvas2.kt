@@ -14,6 +14,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 import androidx.window.core.layout.WindowSizeClass
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.staticCompositionLocalOf
 
 @Composable
 fun DrawingCanvas2(
@@ -25,6 +27,13 @@ fun DrawingCanvas2(
     val windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     //val minHeightDp = windowSizeClass.minHeightDp
     //val minWidthDp = windowSizeClass.minWidthDp
+
+    val localWindowSizeClass: ProvidableCompositionLocal<WindowSizeClass> =
+        staticCompositionLocalOf { error("No window size class provided") }
+
+    //localWindowSizeClass.
+
+
     // 1. Create the TextMeasurer
     val textMeasurer = rememberTextMeasurer()
     val textToDraw = "Hello KMP 2026"

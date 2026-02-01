@@ -2,6 +2,8 @@ package com.guzzardo.jjtictactoe1
 
 import androidx.compose.ui.graphics.ImageBitmap
 import com.guzzardo.jjtictactoe1.GameView.BoardSpaceValues
+import jjtictactoe1.composeapp.generated.resources.Res
+import jjtictactoe1.composeapp.generated.resources.prize_token
 
 object GameCompanion { // originally GameView.companion object
     val FPS_MS = (1000 / 2).toLong()
@@ -104,4 +106,10 @@ object GameCompanion { // originally GameView.companion object
     lateinit var mBmpAvailableMove: ImageBitmap
     lateinit var mBmpTakenMove: ImageBitmap
     lateinit var mBmpPrize: ImageBitmap
+
+    init {
+        //mBmpPrize = getResBitmap(Res.drawable.prize_token)
+        //mBmpPrize = createBitmapFromResource(Res.drawable.prize_token)
+    }
+
 }

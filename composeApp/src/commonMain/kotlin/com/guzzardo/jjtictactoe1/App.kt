@@ -3,6 +3,7 @@ package com.guzzardo.jjtictactoe1
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,21 +11,33 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.window.core.layout.WindowSizeClass
 import jjtictactoe1.composeapp.generated.resources.Res
 import jjtictactoe1.composeapp.generated.resources.compose_multiplatform
 import jjtictactoe1.composeapp.generated.resources.favorites
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
 @Composable
 @Preview
-fun App() {
+fun App(windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass) {
     //We're only allowed 1 app!
+    val height = WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND
+    val width = WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
+    val heightDp = height.dp.value
+    val widthDp = width.dp.value
+    val windowSize = Offset(widthDp, heightDp)
+
+    //val windowHeight = windowSizeClass.minHeightDp
+    //val windowWidth = windowSizeClass.minWidthDp
+
     MaterialTheme {
         //val gamePlay = remember { GameView(20F, 20F, Color.Red, Color.Blue)}
         var showContent by remember { mutableStateOf(false) }
@@ -45,54 +58,60 @@ fun App() {
             Button(onClick = { showContent = !showContent }) {
                 Text("Click me!")
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    //Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                    //Text("Window width: $minWidthDp")
-                    //Text("Window height: $minHeightDp")
-                    val resourceName = stringResource(Res.string.favorites)
-                    //Text(text = resourceName)
-                    //TestFun("joe")
-                    //SampleNavigationSuiteScaffoldParts()
-                    //KmpLineDrawingScreen()
-                    GameCanvas(
-                        onAction = viewModel::onAction,
-                        modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f))
-                    /*
-                    DrawingCanvas(
-                        state.paths,
-                         currentPath = state.currentPath,
-                         onAction = viewModel::onAction,
-                         modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f))
-                    */
-                    CanvasControls(
-                        selectedColor = viewModel.selectedColor,
-                        colors = allColors,
-                        onSelectColor = {
-                            viewModel.onAction(DrawingAction.OnSelectColor(it))
-                        },
-                        onClearCanvas = {
-                            viewModel.onAction(DrawingAction.OnClearCanvasClick)
-                        }
-                    )
-                    //InteractiveCanvasWithItems()
-                    //TestImage()
-                    //InteractiveCanvasWithItems(viewModel)
-                    //MoveableCircleScreen()
+                AnimatedVisibility(showContent) {
+                    val greeting = remember { Greeting().greet() }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        //Image(painterResource(Res.drawable.compose_multiplatform), null)
+                        //Text("Compose: $greeting")
+                        //Text("Window width: $minWidthDp")
+                        //Text("Window height: $minHeightDp")
+                        val resourceName = stringResource(Res.string.favorites)
+                        //Text(text = resourceName)
+                        //TestFun("joe")
+                        //SampleNavigationSuiteScaffoldParts()
+                        //KmpLineDrawingScreen()
+                        GameCanvas(
+                            onAction = MyViewModel()::onAction,
+                            model = viewModel(),
+                            size = windowSize,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                            //.weight(1f)
+                        )
+                        /*
+                        DrawingCanvas(
+                            state.paths,
+                             currentPath = state.currentPath,
+                             onAction = viewModel::onAction,
+                             modifier = Modifier
+                                 .fillMaxWidth()
+                                 .weight(1f))
+
+                        CanvasControls(
+                            selectedColor = viewModel.selectedColor,
+                            colors = allColors,
+                            onSelectColor = {
+                                viewModel.onAction(DrawingAction.OnSelectColor(it))
+                            },
+                            onClearCanvas = {
+                                viewModel.onAction(DrawingAction.OnClearCanvasClick)
+                            }
+                        )
+                        */
+                        //InteractiveCanvasWithItems()
+                        //TestImage()
+                        //InteractiveCanvasWithItems(viewModel)
+                        //MoveableCircleScreen()
+                    }
                 }
             }
         }
     }
-}
+
+
 
 
 
